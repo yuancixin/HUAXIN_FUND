@@ -2,7 +2,10 @@
 
 import tushare as ts
 import pandas as pd
-from config.properties import ZCE, DCE, SHF, TOKEN
+import os
+import time
+import csv
+from config.properties import ZCE_CODE, DCE_CODE, SHF_CODE, TOKEN
 from config.properties import SOURCE_DIR
 
 
@@ -23,19 +26,22 @@ def get_all_data(start_date, end_date, year_code):
     result = pd.DataFrame()
 
     print('ZCE开始')
-    for code in ZCE:
+    for code in ZCE_CODE:
         df = get_future_data('%s.ZCE' % code.replace(" ", year_code[1]), start_date, end_date)
         df['ts_code'] = code
+        df['year'] = year_code
         result = result.append(df)
     print('DCE开始')
-    for code in DCE:
+    for code in DCE_CODE:
         df = get_future_data('%s.DCE' % code.replace(" ", year_code), start_date, end_date)
         df['ts_code'] = code
+        df['year'] = year_code
         result = result.append(df)
     print('SHF开始')
-    for code in SHF:
+    for code in SHF_CODE:
         df = get_future_data('%s.SHF' % code.replace(" ", year_code), start_date, end_date)
         df['ts_code'] = code
+        df['year'] = year_code
         result = result.append(df)
     return result
 
@@ -45,16 +51,25 @@ if __name__ == '__main__':
     """
     期货数据接口每分钟最多调用120次，单次最大2000条，总量不限制。注意设定好调用频率
     """
-    print('---期货数据爬取开始---')
-    pro = ts.pro_api(TOKEN) #设定TOKEN
+    print('---程序开始，开始爬取期货数据！---')
+    pro = ts.pro_api(TOKEN)  # 设定TOKEN
     
     start_date = '20010101'
-    end_date = '20181125'
-    year_code = ['19']
+    end_date = '20181126'
+    year_code = ['13', '14', '15', '16', '17', '18', '19', '20']
     
     for year in year_code:
         print('%s开始' % year)
         result = get_all_data(start_date, end_date, year)
-        result.to_csv('%s/future_data.csv' % SOURCE_DIR, mode='a', encoding='utf-8')
-        
-    print('---期货数据爬取结束---')
+        result.to_csv('%s/future_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/future_data.csv' % SOURCE_DIR), mode='a', encoding='utf-8')
+        time.sleep(60)
+    
+    print('---爬取期货数据结束,正在进行数据去重!---')
+    df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
+    df_source.sort_values(by=['ts_code', 'trade_date', 'year'], ascending=(True, True, True), inplace=True)
+    df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
+    df_source.drop('Unnamed: 0', axis=1, inplace=True)
+    df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, encoding='utf-8')
+    
+    print('---程序结束---')
+    
