@@ -1,9 +1,9 @@
+# coding=UTF-8
 '''
 Created on 2018年11月26日
 
 @author: wanglx
 '''
-# coding=UTF-8
 import pandas as pd
 import numpy as np
 import csv
@@ -11,6 +11,7 @@ from config.properties import SOURCE_DIR
 from config.properties import CODE_COMBINATION, ZCE_CODE, DCE_CODE, SHF_CODE
 import matplotlib.pyplot as plt
 import datetime
+
 
 def add_close_difference(df, code1, code2):
     """
@@ -83,10 +84,10 @@ def show1(df, code, N):
     展示单份合约收盘价与N日均线
     """
     df1 = df[df['ts_code'] == code][['trade_date', 'close', 'vol', 'oi']].sort_values('trade_date', ascending=True)
-    df1['trade_date'] = df1['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x),'%Y%m%d'))
+    df1['trade_date'] = df1['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x), '%Y%m%d'))
     df1['ave_close%s' % N] = get_ave_line(df1['close'], N)
-    plt.plot(df1['trade_date'],df1['close'], c='red', label='close')
-    plt.plot(df1['trade_date'],df1['ave_close%s' % N], c='blue', label='ave_close%s' % N)
+    plt.plot(df1['trade_date'], df1['close'], c='red', label='close')
+    plt.plot(df1['trade_date'], df1['ave_close%s' % N], c='blue', label='ave_close%s' % N)
     plt.legend(loc='upper left')
     plt.suptitle('%s (N=%s)' % (code, N))
     plt.show()
@@ -96,35 +97,24 @@ def show2(df, code1, code2, N):
     """
     展示两份合约成交量、持仓量、差价及N日差价
     """
+    print(code1, code2)
     result = add_close_difference(df, code1, code2)
-    result['trade_date'] = result['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x),'%Y%m%d'))
+    result['trade_date'] = result['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x), '%Y%m%d'))
     result['ave_difference%s' % N] = get_ave_line(result['difference'], N)
     result['ave_close1%s' % N] = get_ave_line(result['close1'], N)
     result['ave_close2%s' % N] = get_ave_line(result['close2'], N)
     plt.figure(1)
-    plt.subplot(611)
-    plt.plot(result['trade_date'],result['difference'], c='red', label='difference')
-    plt.plot(result['trade_date'],result['ave_difference%s' % N], c='blue', label='ave_difference%s' % N)
+    plt.subplot(311)
+    plt.plot(result['trade_date'], result['difference'], c='red', label='difference')
+    plt.plot(result['trade_date'], result['ave_difference%s' % N], c='blue', label='ave_difference%s' % N)
     plt.legend(loc='upper left')
-    plt.subplot(612)
-    plt.plot(result['trade_date'],result['oi1'], c='red', label='oi1')
-    plt.plot(result['trade_date'],result['oi2'], c='blue', label='oi2')
+    plt.subplot(312)
+    plt.plot(result['trade_date'], result['oi1'], c='red', label='oi1')
+    plt.plot(result['trade_date'], result['oi2'], c='blue', label='oi2')
     plt.legend(loc='upper left')
-    plt.subplot(613)
-    plt.plot(result['trade_date'],result['vol1'], c='red', label='vol1')
-    plt.plot(result['trade_date'],result['vol2'], c='blue', label='vol2')
-    plt.legend(loc='upper left')
-    plt.subplot(614)
-    plt.plot(result['trade_date'],result['close1'], c='red', label='close1')
-    plt.plot(result['trade_date'],result['close2'], c='blue', label='close2')
-    plt.legend(loc='upper left')
-    plt.subplot(615)
-    plt.plot(result['trade_date'],result['close1'], c='red', label='close1')
-    plt.plot(result['trade_date'],result['ave_close1%s' % N], c='blue', label='ave_close1%s' % N)
-    plt.legend(loc='upper left')
-    plt.subplot(616)
-    plt.plot(result['trade_date'],result['close2'], c='red', label='close2')
-    plt.plot(result['trade_date'],result['ave_close2%s' % N], c='blue', label='ave_close2%s' % N)
+    plt.subplot(313)
+    plt.plot(result['trade_date'], result['vol1'], c='red', label='vol1')
+    plt.plot(result['trade_date'], result['vol2'], c='blue', label='vol2')
     plt.legend(loc='upper left')
     plt.suptitle('%s and %s (N=%s)' % (code1, code2, N))
     plt.show()
@@ -136,17 +126,19 @@ if __name__ == '__main__':
     
     strat_date = 20150101
     end_date = 20181231
-    df_source = df_source[df_source['trade_date'] > strat_date]
+#     df_source = df_source[df_source['trade_date'] > strat_date]
     
     N = 60
-    M = 0.02
+    M = 0.01
+    
 #     result_codes = get_code_near_ave(df_source, N, M)
-
+#     result_codes = DCE_CODE
 #     for code in result_codes:
 #         if isinstance(code, str):
 #             show1(df_source, code, N)
 #         else:
 #             show2(df_source, code[0], code[1], N)
-    show1(df_source, 'RU 01', N)
-    show2(df_source, 'C 01', 'C 05', N)
+
+    show1(df_source, 'C 01', N)
+#     show2(df_source, 'C 01', 'C 05', N)
     

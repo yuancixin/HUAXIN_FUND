@@ -1,9 +1,9 @@
+# coding=UTF-8
 '''
 Created on 2018年11月26日
 
 @author: wanglx
 '''
-# coding=UTF-8
 """
 单个合约代码
 """

@@ -2,6 +2,7 @@
 
 import tushare as ts
 import pandas as pd
+import datetime
 import os
 import time
 import csv
@@ -48,10 +49,11 @@ if __name__ == '__main__':
     """
     期货数据接口每分钟最多调用120次，单次最大2000条，总量不限制。注意设定好调用频率
     """
+    df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-    start_date = '20010101'
-    end_date = '20181126'
-    year_code = ['13', '14', '15', '16', '17', '18', '19', '20']
+    start_date = df_source['trade_date']
+    end_date = datetime.datetime.now().strftime('%Y%m%d')
+    year_code = ['19', '20']
     
     print('---程序开始，开始爬取期货数据！---')
     pro = ts.pro_api(TOKEN)  # 设定TOKEN
