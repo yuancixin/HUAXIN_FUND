@@ -54,10 +54,11 @@ def backtest1(df, code, N):
     
     year_list = df_code['year'].drop_duplicates()
     for year in year_list:
-        df_year = df_code[df_code['year'] == year]
+        df_year = df_code[df_code['year'] == year][15:-15]
         i = 1
         while(i < df_year.shape[0] - 1):
             if df_year[i - 1:i]['difference'].values[0] * df_year[i:i + 1]['difference'].values[0] <= 0:
+                print('======%s触发交易======' % df_year[i:i + 1]['trade_date'].values[0])
 #                 击穿
                 if trade_trend == '平':
                     if df_year[i:i + 1]['difference'].values[0] > df_year[i - 1:i]['difference'].values[0]:  # 多
@@ -89,11 +90,13 @@ def backtest1(df, code, N):
             i = i + 1 
         
         if trade_trend == '多':
-            print('合约结束，平仓')
+            print('======%s因合约结束，平仓======' % df_year[i:i + 1]['trade_date'].values[0])
             unwind(df_year[i:i + 1]['close'].values[0] , B_PRICE)
+            trade_trend = '平'
         elif trade_trend == '空':
-            print('合约结束，平仓')
+            print('======%s因合约结束，平仓======' % df_year[i:i + 1]['trade_date'].values[0])
             unwind(S_PRICE , df_year[i:i + 1]['close'].values[0])
+            trade_trend = '平'
         else:
             pass
             

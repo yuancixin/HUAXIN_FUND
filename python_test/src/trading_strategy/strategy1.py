@@ -139,6 +139,6 @@ if __name__ == '__main__':
 #         else:
 #             show2(df_source, code[0], code[1], N)
 
-    show1(df_source, 'C 01', N)
+    show1(df_source, 'JD 05', N)
 #     show2(df_source, 'C 01', 'C 05', N)
     
