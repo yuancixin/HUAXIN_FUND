@@ -51,7 +51,7 @@ if __name__ == '__main__':
     """
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-    start_date = df_source['trade_date']
+    start_date = str(df_source['trade_date'].max())
     end_date = datetime.datetime.now().strftime('%Y%m%d')
     year_code = ['19', '20']
     

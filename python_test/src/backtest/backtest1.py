@@ -109,8 +109,13 @@ def backtest1(df, code, N):
 if __name__ == '__main__':
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-    code = 'JD 05'
+    code = 'RU 05'
     
-    for N in range(10, 121, 5):
+#     backtest1(df_source, code, 20)
+    
+    for N in range(20, 201, 1):
         backtest1(df_source, code, N)
     
+
+
+
