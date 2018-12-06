@@ -125,5 +125,5 @@ if __name__ == '__main__':
             for M in range(1, N + 1, 1):
                 result_list.append(backtest(df_source, code, N, M))
         df_result = pd.DataFrame(result_list, columns=('ts_code', 'N', 'M', 'trade_num', 'profit_num', 'retreat_max', 'capital_available', 'capital_max', 'capital_min'))  # 生成空的pandas表
-        df_result.to_csv('%s/result.csv' % RESULT_DIR, header=not os.path.exists('%s/result.csv' % RESULT_DIR), mode='a', encoding='utf-8')
+        df_result.to_csv('%s/NM_BREAKTHROUGH_RESULT.csv' % RESULT_DIR, header=not os.path.exists('%s/NM_BREAKTHROUGH_RESULT.csv' % RESULT_DIR), mode='a', encoding='utf-8')
             

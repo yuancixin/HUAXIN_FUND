@@ -52,4 +52,4 @@ TOKEN = '03732aff833845903c8d68dd24c79e7c41d6b2f2e8c62ee13c2713e5'
 路径配置
 """
 SOURCE_DIR = 'D:/HUAXIN_FUND/SourceData'  # 源文件目录
-RESULT_DIR = 'D:/HUAXIN_FUND/ResultData'  # 源文件目录
+RESULT_DIR = 'D:/HUAXIN_FUND/ResultData'  # 结果文件目录
