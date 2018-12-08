@@ -13,6 +13,9 @@ from config.properties import DCE_CODE, SHF_CODE
 
 
 def backtest(df, code, N, M):
+    """
+    NM策略结果
+    """
     capital_base = 1000000  # 初始资本
     capital_available = 1000000  # 可用资金
     capital_last = 1000000  # 上次资产

@@ -9,6 +9,7 @@ import numpy as np
 import csv
 from config.properties import SOURCE_DIR
 from config.properties import CODE_COMBINATION, ZCE_CODE, DCE_CODE, SHF_CODE
+from config.parameter import BEST_N,BEST_NM
 import matplotlib.pyplot as plt
 import datetime
 
@@ -74,10 +75,44 @@ def get_code_near_ave(df, N, M):
             df1['ave_close%s' % N] = get_ave_line(df1['difference'], N)
             if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
                 result.append(codes)
-    
+    print('%s日均线附近的合约及合约组合：' % N)
     print(result)
     return result
 
+
+def get_code_fit_strategy(df):
+    result_N = []
+    result_NM = [[],[]]
+    for x in BEST_N:
+        code = x[0]
+        N = x[1]
+        df_code = df[df['ts_code'] == code][['trade_date', 'close', 'year']].sort_values('trade_date', ascending=True)
+        df_code['ave_close%s' % N] = get_ave_line(df_code['close'], N)
+        df_code['difference'] = df_code['close'] - df_code['ave_close%s' % N]
+        if df_code[-1:]['difference'].values[0] * df_code[-2:-1]['difference'].values[0] <= 0:
+            result_N.append(code)
+    
+    for x in BEST_NM:
+        code = x[0]
+        N = x[1]
+        M = x[2]
+        df_code = df[df['ts_code'] == code][['trade_date', 'close', 'year']].sort_values('trade_date', ascending=True)
+        year = df_code[-1:]['year'].values[0]
+        df_year = df_code[df_code['year'] == year]
+        if df_year.shape[0] > N:
+            if df_year[-1:]['close'].values[0] > df_year[-1 - N : -1]['close'].max() or df_year[-1:]['close'].values[0] < df_year[-1 - N : -1]['close'].min():
+                result_NM[0].append(code)
+            if df_year[-1:]['close'].values[0] < df_year[-1 - M : -1]['close'].min() or df_year[-1:]['close'].values[0] > df_year[-1 - M : -1]['close'].max():
+                result_NM[1].append(code)
+                
+    print('符合N策略的合约：')
+    print(result_N)
+    print('符合NM策略入场的合约：')
+    print(result_NM[0])
+    print('符合NM策略离场的合约：')
+    print(result_NM[1])
+    return result_N,result_NM
+    
 
 def show1(df, code, N):
     """
@@ -128,10 +163,12 @@ if __name__ == '__main__':
     end_date = 20181231
 #     df_source = df_source[df_source['trade_date'] > strat_date]
     
-    N = 22
+    N = 26
     M = 0.01
     
 #     result_codes = get_code_near_ave(df_source, N, M)
+
+    get_code_fit_strategy(df_source)
 #     result_codes = DCE_CODE
 #     for code in result_codes:
 #         if isinstance(code, str):
@@ -139,6 +176,6 @@ if __name__ == '__main__':
 #         else:
 #             show2(df_source, code[0], code[1], N)
 
-    show1(df_source, 'J 01', N)
+#     show1(df_source, 'I 05', N)
 #     show2(df_source, 'C 01', 'C 05', N)
     

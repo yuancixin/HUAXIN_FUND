@@ -21,7 +21,9 @@ def get_ave_line(column, N):
 
 
 def backtest1(df, code, N):
-    
+    """
+    N策略交易结果
+    """   
     def buy(price):
         nonlocal B_PRICE, hold_num
         B_PRICE = price
@@ -123,12 +125,13 @@ def backtest1(df, code, N):
 if __name__ == '__main__':
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-    codes = SHF_CODE + DCE_CODE
-    for code in codes:
-        result_list = []
-        for N in range(5, 201, 1):
-            result_list.append(backtest1(df_source, code, N))
-        df_result = pd.DataFrame(result_list, columns=('ts_code', 'N', 'trade_num', 'profit_num', 'retreat_max', 'capital_available', 'capital_max', 'capital_min'))  # 生成空的pandas表
-        df_result.to_csv('%s/N_AVERAGE_RESULT.csv' % RESULT_DIR, header=not os.path.exists('%s/N_AVERAGE_RESULT.csv' % RESULT_DIR), mode='a', encoding='utf-8')
-#         
+    backtest1(df_source, 'RB 05',96 )
+    
+#     codes = SHF_CODE + DCE_CODE
+#     for code in codes:
+#         result_list = []
+#         for N in range(5, 201, 1):
+#             result_list.append(backtest1(df_source, code, N))
+#         df_result = pd.DataFrame(result_list, columns=('ts_code', 'N', 'trade_num', 'profit_num', 'retreat_max', 'capital_available', 'capital_max', 'capital_min'))  # 生成空的pandas表
+#         df_result.to_csv('%s/N_AVERAGE_RESULT.csv' % RESULT_DIR, header=not os.path.exists('%s/N_AVERAGE_RESULT.csv' % RESULT_DIR), mode='a', encoding='utf-8')       
 
