@@ -9,7 +9,7 @@ import numpy as np
 import csv
 from config.properties import SOURCE_DIR
 from config.properties import CODE_COMBINATION, ZCE_CODE, DCE_CODE, SHF_CODE
-from config.parameter import BEST_N,BEST_NM
+from config.parameter import BEST_N, BEST_NM
 import matplotlib.pyplot as plt
 import datetime
 
@@ -82,7 +82,7 @@ def get_code_near_ave(df, N, M):
 
 def get_code_fit_strategy(df):
     result_N = []
-    result_NM = [[],[]]
+    result_NM = [[], []]
     for x in BEST_N:
         code = x[0]
         N = x[1]
@@ -91,19 +91,46 @@ def get_code_fit_strategy(df):
         df_code['difference'] = df_code['close'] - df_code['ave_close%s' % N]
         if df_code[-1:]['difference'].values[0] * df_code[-2:-1]['difference'].values[0] <= 0:
             result_N.append(code)
-    
+
     for x in BEST_NM:
         code = x[0]
         N = x[1]
         M = x[2]
+        trade_trend = '平'
+        
         df_code = df[df['ts_code'] == code][['trade_date', 'close', 'year']].sort_values('trade_date', ascending=True)
         year = df_code[-1:]['year'].values[0]
-        df_year = df_code[df_code['year'] == year]
+        df_year = df_code[df_code['year'] == year][15:]
+        
+        i = N
         if df_year.shape[0] > N:
-            if df_year[-1:]['close'].values[0] > df_year[-1 - N : -1]['close'].max() or df_year[-1:]['close'].values[0] < df_year[-1 - N : -1]['close'].min():
-                result_NM[0].append(code)
-            if df_year[-1:]['close'].values[0] < df_year[-1 - M : -1]['close'].min() or df_year[-1:]['close'].values[0] > df_year[-1 - M : -1]['close'].max():
-                result_NM[1].append(code)
+            while(i < df_year.shape[0] - 1):
+                if trade_trend == '平' :
+                    if df_year[i:i + 1]['close'].values[0] > df_year[i - N : i]['close'].max():
+                        trade_trend = '多'
+                    elif df_year[i:i + 1]['close'].values[0] < df_year[i - N : i]['close'].min():
+                        trade_trend = '空'
+                    else:
+                        pass
+                elif trade_trend == '多' :
+                    if df_year[i:i + 1]['close'].values[0] < df_year[i - M : i]['close'].min():
+                        trade_trend = '平'
+                    else:
+                        pass
+                elif trade_trend == '空':
+                    if df_year[i:i + 1]['close'].values[0] > df_year[i - M : i]['close'].max():
+                        trade_trend = '平'
+                    else:
+                        pass
+                else:
+                    pass
+                i = i + 1
+            if trade_trend == '平':
+                if df_year[-1:]['close'].values[0] > df_year[-1 - N :-1]['close'].max() or df_year[-1:]['close'].values[0] < df_year[-1 - N :-1]['close'].min():
+                    result_NM[0].append(code)
+            else:
+                if df_year[-1:]['close'].values[0] < df_year[-1 - M :-1]['close'].min() or df_year[-1:]['close'].values[0] > df_year[-1 - M :-1]['close'].max():
+                    result_NM[1].append(code)
                 
     print('符合N策略的合约：')
     print(result_N)
@@ -111,7 +138,7 @@ def get_code_fit_strategy(df):
     print(result_NM[0])
     print('符合NM策略离场的合约：')
     print(result_NM[1])
-    return result_N,result_NM
+    return result_N, result_NM
     
 
 def show1(df, code, N):
@@ -163,12 +190,12 @@ if __name__ == '__main__':
     end_date = 20181231
 #     df_source = df_source[df_source['trade_date'] > strat_date]
     
-    N = 26
+    N = 11
     M = 0.01
     
 #     result_codes = get_code_near_ave(df_source, N, M)
 
-    get_code_fit_strategy(df_source)
+#     get_code_fit_strategy(df_source)
 #     result_codes = DCE_CODE
 #     for code in result_codes:
 #         if isinstance(code, str):
@@ -176,6 +203,6 @@ if __name__ == '__main__':
 #         else:
 #             show2(df_source, code[0], code[1], N)
 
-#     show1(df_source, 'I 05', N)
+    show1(df_source, 'CS 01', N)
 #     show2(df_source, 'C 01', 'C 05', N)
     

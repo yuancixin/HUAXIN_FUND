@@ -1,5 +1,4 @@
 # coding=UTF-8
-
 import tushare as ts
 import pandas as pd
 import datetime
@@ -56,22 +55,22 @@ def main():
     year_code = ['19', '20']
     
     if start_date == end_date:
-        print('数据已更新')
+        print('---期货数据已是最新---')
     else:
-        print('---开始爬取期货数据！---')
+        print('---开始更新期货数据！---')
         pro = ts.pro_api(TOKEN)  # 设定TOKEN
         for year in year_code:
             print('%s开始' % year)
             result = get_all_daily(pro, start_date, end_date, year)
-            result.to_csv('%s/future_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/future_data.csv' % SOURCE_DIR), mode='a', encoding='utf-8')
-            time.sleep(60)
-        print('---爬取期货数据结束,正在进行数据去重!---')
+            result.to_csv('%s/future_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/future_data.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')
+            if not year_code[len(year_code) - 1] == year:
+                time.sleep(60)
+        print('---期货数据更新完成,正在进行数据去重!---')
         df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
         df_source.sort_values(by=['ts_code', 'trade_date', 'year'], ascending=(True, True, True), inplace=True)
         df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
-        df_source.drop('Unnamed: 0', axis=1, inplace=True)
-        df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, encoding='utf-8')
-        print('---数据更新程序结束---')
+        df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
+        print('---期货数据已是最新---')
 
 
 if __name__ == '__main__': 
