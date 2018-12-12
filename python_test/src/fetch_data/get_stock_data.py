@@ -42,9 +42,14 @@ def get_day_daily(pro, trade_date):
     return df
 
 
-def main():
+def get_daily_basic(pro, trade_date):
+    df = pro.daily_basic(ts_code='', trade_date=trade_date)
+    return df
+
+
+def update_daily():
     """
-    自动更新股票数据
+    更新股票日线行情数据
     """
     df_source = pd.read_csv('%s/stock_daily_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
@@ -52,9 +57,9 @@ def main():
     end_date = datetime.datetime.now().strftime('%Y%m%d')
     
     if start_date == end_date:
-        print('---股票数据已是最新---')
+        print('---股票日线行情数据已是最新---')
     else:
-        print('---开始更新股票数据！---')
+        print('---开始更新股票日线行情数据！---')
         pro = ts.pro_api(TOKEN)  # 设定TOKEN
         get_code_list(pro)
         trade_days = get_trade_cal(pro, start_date, end_date)
@@ -62,14 +67,45 @@ def main():
             print('%s爬取开始' % trade_date)
             daily_data = get_day_daily(pro, trade_date)
             daily_data.to_csv('%s/stock_daily_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/stock_daily_data.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')
-        print('---股票数据更新完成,正在进行数据去重!---')
+        print('---股票日线行情数据更新完成,正在进行数据去重!---')
         df_source = pd.read_csv('%s/stock_daily_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
         df_source.sort_values(by=['ts_code', 'trade_date'], ascending=(True, True), inplace=True)
         df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
         df_source.to_csv('%s/stock_daily_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
-        print('---股票数据已是最新---')
+        print('---股票日线行情数据已是最新---')
 
+
+def update_basic():
+    """
+    更新股票每日指标数据
+    """
+    df_source = pd.read_csv('%s/stock_daily_basic.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
+    
+    start_date = str(df_source['trade_date'].max())
+    end_date = datetime.datetime.now().strftime('%Y%m%d')
+    
+    if start_date == end_date:
+        print('---股票每日指标数据已是最新---')
+    else:
+        print('---开始更新股票每日指标数据！---')
+        pro = ts.pro_api(TOKEN) 
+        trade_days = get_trade_cal(pro, start_date, end_date)
+        for trade_date in trade_days:
+            print('%s爬取开始' % trade_date)
+            daily_basic = get_daily_basic(pro, trade_date)         
+            daily_basic.to_csv('%s/stock_daily_basic.csv' % SOURCE_DIR, header=not os.path.exists('%s/stock_daily_basic.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')
+        print('---股票每日指标数据更新完成,正在进行数据去重!---')
+        df_source = pd.read_csv('%s/stock_daily_basic.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
+        df_source.sort_values(by=['ts_code', 'trade_date'], ascending=(True, True), inplace=True)
+        df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
+        df_source.to_csv('%s/stock_daily_basic.csv' % SOURCE_DIR, index=0, encoding='utf-8')
+        print('---股票每日指标数数据已是最新---')
+
+
+def main():
+    update_daily()
+    update_basic()
+      
 
 if __name__ == '__main__':
-    main()
-        
+    main()    

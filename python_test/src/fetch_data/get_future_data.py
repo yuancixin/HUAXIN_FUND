@@ -25,7 +25,7 @@ def get_all_daily(pro, start_date, end_date, year_code):
     result = pd.DataFrame()
     print('ZCE开始')
     for code in ZCE_CODE:
-        df = get_code_daily(pro, '%s.ZCE' % code.replace(" ", year_code[1]), start_date, end_date)
+        df = get_code_daily(pro, '%s.ZCE' % code.replace(" ", year_code), start_date, end_date)
         df['ts_code'] = code
         df['year'] = year_code
         result = result.append(df)
@@ -51,6 +51,7 @@ def main():
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
     start_date = str(df_source['trade_date'].max())
+#     start_date = '20000101'
     end_date = datetime.datetime.now().strftime('%Y%m%d')
     year_code = ['19', '20']
     

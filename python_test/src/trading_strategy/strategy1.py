@@ -43,23 +43,10 @@ def get_code_near_ave(df, N, M):
     M:均线邻近区间比率
     """
     result = []
-    for code in ZCE_CODE:
-        df1 = df[df['ts_code'] == code][['trade_date', 'close']].sort_values('trade_date', ascending=True)
-        if df1.shape[0] > 0:
-            df1['ave_close%s' % N] = get_ave_line(df1['close'], N)
-            df1['close'] = df1['close'].apply(pd.to_numeric)
-            if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['close'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
-                result.append(code)
-
-    for code in DCE_CODE:
-        df1 = df[df['ts_code'] == code][['trade_date', 'close']].sort_values('trade_date', ascending=True)
-        if df1.shape[0] > 0:
-            df1['ave_close%s' % N] = get_ave_line(df1['close'], N)
-            df1['close'] = df1['close'].apply(pd.to_numeric)
-            if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['close'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
-                result.append(code)
-            
-    for code in SHF_CODE:
+    
+    all_codes = ZCE_CODE + DCE_CODE + SHF_CODE
+    
+    for code in all_codes:
         df1 = df[df['ts_code'] == code][['trade_date', 'close']].sort_values('trade_date', ascending=True)
         if df1.shape[0] > 0:
             df1['ave_close%s' % N] = get_ave_line(df1['close'], N)
