@@ -17,15 +17,16 @@ from config.properties import SOURCE_DIR
 def show_seasonal_decompose(df, code, cycle):
     
     df_code = df[df['ts_code'] == code].sort_values('trade_date', ascending=True)
+    df_code = df_code.dropna(axis=0, subset=['close'], how='all')
     if ADF(df_code['close'])[1] > 0.05:
         print('是非平稳')
-        decomposition = seasonal_decompose(df_code['close'], model="additive", freq=cycle)
+        decomposition = seasonal_decompose(df_code['close'], model="additive", two_sided=False, freq=cycle)
         decomposition.plot()
         plot_acf(df_code['close']).show()
         plt.show()
     else:
         print('平稳序列')
-        decomposition = seasonal_decompose(df_code['close'], model="additive", freq=cycle)
+        decomposition = seasonal_decompose(df_code['close'], model="additive", two_sided=False, freq=cycle)
         decomposition.plot()
         plot_acf(df_code['close']).show()
         plt.show()
@@ -33,7 +34,7 @@ def show_seasonal_decompose(df, code, cycle):
 
 if __name__ == '__main__': 
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
-    code = 'M 05'
-    cycle = 1000
+    code = 'Y 01'
+    cycle = 700
     show_seasonal_decompose(df_source, code, cycle)
 

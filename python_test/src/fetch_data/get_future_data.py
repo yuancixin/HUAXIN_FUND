@@ -29,14 +29,13 @@ def get_all_daily(pro, start_date, end_date, year_code):
         df['ts_code'] = code
         df['year'] = year_code
         result = result.append(df)
-    time.sleep(20)
     print('DCE开始')
     for code in DCE_CODE:
         df = get_code_daily(pro, '%s.DCE' % code.replace(" ", year_code), start_date, end_date)
         df['ts_code'] = code
         df['year'] = year_code
         result = result.append(df)
-    time.sleep(20)
+    time.sleep(60)
     print('SHF开始')
     for code in SHF_CODE:
         df = get_code_daily(pro, '%s.SHF' % code.replace(" ", year_code), start_date, end_date)
@@ -55,6 +54,7 @@ def main():
     start_date = str(df_source['trade_date'].max())
 #     start_date = '20000101'
     end_date = datetime.datetime.now().strftime('%Y%m%d')
+#     year_code = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
     year_code = ['19', '20']
     
     if start_date == end_date:
