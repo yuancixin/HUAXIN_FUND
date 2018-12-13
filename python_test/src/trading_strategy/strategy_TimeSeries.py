@@ -10,6 +10,7 @@ import csv
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller as ADF
 from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.graphics.tsaplots import plot_acf
 from config.properties import SOURCE_DIR
 
 
@@ -20,11 +21,13 @@ def show_seasonal_decompose(df, code, cycle):
         print('是非平稳')
         decomposition = seasonal_decompose(df_code['close'], model="additive", freq=cycle)
         decomposition.plot()
+        plot_acf(df_code['close']).show()
         plt.show()
     else:
         print('平稳序列')
         decomposition = seasonal_decompose(df_code['close'], model="additive", freq=cycle)
         decomposition.plot()
+        plot_acf(df_code['close']).show()
         plt.show()
 
 
