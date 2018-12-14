@@ -34,7 +34,7 @@ def show_seasonal_decompose(df, code, cycle):
 
 if __name__ == '__main__': 
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
-    code = 'Y 01'
+    code = 'JD 01'
     cycle = 700
     show_seasonal_decompose(df_source, code, cycle)
 
