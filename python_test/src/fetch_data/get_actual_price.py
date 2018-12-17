@@ -34,30 +34,35 @@ def get_JD_price():
     res = urllib.request.urlopen(herf)
     html = res.read().decode("gb2312", "ignore")
     soup = BeautifulSoup(html, "html.parser")
-
     title = soup.title.get_text()
-    p_list = soup.find('div', id='content').find_all('p')
-    price_list = []
-    for i in p_list:
-        if '德州-' in i.get_text():
-            price_list.append(float(i.get_text().split('参考价')[1]))
-            
-    price_sum = 0
-    for i in price_list:
-        price_sum = price_sum + i
-        
-    ave_price = price_sum / len(price_list)
+    date_now = datetime.datetime.now().strftime('%Y{y}%m{m}%d{d}').format(y='年',m='月',d='日')
     
-    result = [[today, str(round(ave_price, 3)), ";".join([str(x) for x in price_list]), title]]
-    df_result = pd.DataFrame(result, columns=('trade_date', 'ave_price', 'price_list', 'title'))
-    print(df_result[['title', 'ave_price']])
-    df_result.to_csv('%s/JD_price.csv' % SOURCE_DIR, header=not os.path.exists('%s/JD_price.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')  
-    print('---采集完成，正在进行数据清洗---')
-    df_source = pd.read_csv('%s/JD_price.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
-    df_source.sort_values(by=['title', 'trade_date'], ascending=(True, True), inplace=True)
-    df_source.drop_duplicates(subset=['title'], keep='first', inplace=True)
-    df_source.to_csv('%s/JD_price.csv' % SOURCE_DIR, index=0, encoding='utf-8')
-    print('---数据更新完成---')
+    if date_now in title:
+        p_list = soup.find('div', id='content').find_all('p')
+        price_list = []
+        for i in p_list:
+            if '德州-' in i.get_text():
+                price =  i.get_text().split('参考价')[1].split('-')[0].replace('涨', '').replace('降', '')
+                price_list.append(float(price))
+            
+        price_sum = 0
+        for i in price_list:
+            price_sum = price_sum + i
+        
+        ave_price = price_sum / len(price_list)
+    
+        result = [[today, str(round(ave_price, 3)), ";".join([str(x) for x in price_list]), title]]
+        df_result = pd.DataFrame(result, columns=('trade_date', 'ave_price', 'price_list', 'title'))
+        print(df_result[['title', 'ave_price']])
+        df_result.to_csv('%s/JD_price.csv' % SOURCE_DIR, header=not os.path.exists('%s/JD_price.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')  
+        print('---采集完成，正在进行数据清洗---')
+        df_source = pd.read_csv('%s/JD_price.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
+        df_source.sort_values(by=['title', 'trade_date'], ascending=(True, True), inplace=True)
+        df_source.drop_duplicates(subset=['title'], keep='first', inplace=True)
+        df_source.to_csv('%s/JD_price.csv' % SOURCE_DIR, index=0, encoding='utf-8')
+        print('---数据更新完成---')
+    else:
+        print('---今日数据还未更新---')
 
     
 def main():

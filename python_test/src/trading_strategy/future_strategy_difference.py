@@ -7,6 +7,8 @@ Created on 2018年12月14日
 
 import pandas as pd
 import csv
+import datetime
+import matplotlib.pyplot as plt
 from config.properties import SOURCE_DIR
 
 
@@ -17,7 +19,10 @@ def get_difference(df, code):
     df_actual = df_actual[['trade_date', 'ave_price']]
     df_difference = pd.merge(df_actual, df_future, how='left')
     df_difference['ave_price'] = df_difference['ave_price'] * 1000
-    print(df_difference)
+    df_difference['trade_date'] = df_difference['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x), '%Y%m%d'))
+    df_difference['difference'] = df_difference['close'] - df_difference['ave_price']
+    plt.plot(df_difference['trade_date'], df_difference['difference'], c='red', label='difference')
+    plt.show()
     
 
 if __name__ == '__main__':

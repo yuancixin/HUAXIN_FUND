@@ -68,6 +68,9 @@ def get_code_near_ave(df, N, M):
 
 
 def get_code_fit_strategy(df):
+    """
+    获取符合N和NM策略的合约
+    """
     result_N = []
     result_NM = [[], []]
     for x in BEST_N:
