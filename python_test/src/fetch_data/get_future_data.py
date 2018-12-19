@@ -51,8 +51,8 @@ def main():
     """
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-#     start_date = str(df_source['trade_date'].max())
-    start_date = '20181111'
+    start_date = str(df_source['trade_date'].max())
+#     start_date = '20000101'
     end_date = datetime.datetime.now().strftime('%Y%m%d')
 #     year_code = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
     year_code = ['19', '20']
