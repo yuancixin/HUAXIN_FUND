@@ -20,7 +20,8 @@ def get_difference(df, code):
     df_difference = pd.merge(df_actual, df_future, how='left')
     df_difference['ave_price'] = df_difference['ave_price'] * 1000
     df_difference['trade_date'] = df_difference['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x), '%Y%m%d'))
-    df_difference['difference'] = df_difference['close'] - df_difference['ave_price']
+    df_difference['difference'] = df_difference['ave_price'] - df_difference['close']
+    print(df_difference)
     plt.plot(df_difference['trade_date'], df_difference['difference'], c='red', label='difference')
     plt.show()
     

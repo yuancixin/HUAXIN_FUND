@@ -27,7 +27,6 @@ def get_code_near_ave(df, N, M):
     all_codes = df_baseinfo['ts_code']
     
     for code in all_codes:
-        print(code)
         df1 = df[df['ts_code'] == code][['trade_date', 'close']].sort_values('trade_date', ascending=True)
         if df1.shape[0] > 0:
             df1['ave_close%s' % N] = get_ave_line(df1['close'], N)
@@ -43,7 +42,7 @@ def get_code_near_ave(df, N, M):
 if __name__ == '__main__':
     
     df_source = pd.read_csv('%s/stock_daily_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
-    strat_date = 20170101
+    strat_date = 20180101
     end_date = 20181231
     df_source = df_source[df_source['trade_date'] > strat_date][['ts_code','trade_date','close']]
     
