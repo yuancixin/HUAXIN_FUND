@@ -23,22 +23,18 @@ def download_industry():
     下载东方财富网行业研报文件
     """
     print('---下载东方财富网行业研报数据---')
-    break_flag = False
-    for page in range(1, 6):
-        if break_flag == True:
-            break
-        res = urllib.request.urlopen("http://datainterface.eastmoney.com//EM_DataCenter/js.aspx?type=SR&sty=HYSR&mkt=0&stat=0&cmd=4&code=&sc=&ps=100&p=%s" % page)
+    for page in range(1, 11):
+        res = urllib.request.urlopen("http://datainterface.eastmoney.com//EM_DataCenter/js.aspx?type=SR&sty=HYSR&mkt=0&stat=0&cmd=4&code=&sc=&ps=50&p=%s" % page)
         html = res.read().decode("utf_8", "ignore")[1:-1]
         json_string = json.loads(html)
         for x in json_string:
             x_split = x.split(',')
             secuName = x_split[10]
-            title = x_split[9].replace('&sbquo;', '，').replace('/',':')
+            title = x_split[9].replace('&sbquo;', '，').replace('/', '：').replace(':', '：')
             date = x_split[1].split(' ')[0].replace('/', '')
             infoCode = x_split[2]
             if os.path.exists('%s/%s-%s-%s.pdf' % (RESEARCH_INDUSTRY_DIR, date, secuName, title)) or os.path.exists('%s/%s-%s-%s.html' % (RESEARCH_INDUSTRY_DIR, date, secuName, title)):
-                break_flag = True
-                break
+                continue
             print('正在下载%s-%s-%s' % (date, secuName, title)) 
             res = urllib.request.urlopen("http://data.eastmoney.com/report/%s/hy,%s.html" % (date, infoCode))
             html = res.read().decode("gb2312", "ignore")
@@ -56,21 +52,17 @@ def download_stock():
     下载东方财富网个股研报文件
     """
     print('---下载东方财富网个股研报数据---')
-    break_flag = False
-    for page in range(1, 6):
-        if break_flag == True:
-            break
-        res = urllib.request.urlopen("http://datainterface.eastmoney.com//EM_DataCenter/js.aspx?type=SR&sty=GGSR&ps=100&p=%s&mkt=0&stat=0&cmd=2&code=" % page)
+    for page in range(1, 11):
+        res = urllib.request.urlopen("http://datainterface.eastmoney.com//EM_DataCenter/js.aspx?type=SR&sty=GGSR&ps=50&p=%s&mkt=0&stat=0&cmd=2&code=" % page)
         html = res.read().decode("utf_8", "ignore")[1:-1]
         json_string = json.loads(html)
         for x in json_string:
             secuName = x['secuName']
-            title = x['title'].replace('/',':')
+            title = x['title'].replace('/', '：').replace(':', '：')
             date = x['datetime'].split('T')[0].replace('-', '')
             infoCode = x['infoCode']
-            if os.path.exists('%s/%s-%s-%s.pdf' % (RESEARCH_STOCK_DIR, date, secuName, title)) or os.path.exists('%s/%s-%s-%s.html' % (RESEARCH_STOCK_DIR, date, secuName, title)):
-                break_flag = True
-                break
+            if os.path.exists('%s/%s-%s-%s.pdf' % (RESEARCH_STOCK_DIR, date, secuName, title))  or os.path.exists('%s/%s-%s-%s.html' % (RESEARCH_STOCK_DIR, date, secuName, title)) :
+                continue
             print('正在下载%s-%s-%s' % (date, secuName, title))
             res = urllib.request.urlopen("http://data.eastmoney.com/report/%s/%s.html" % (date, infoCode))
             html = res.read().decode("gb2312", "ignore")
