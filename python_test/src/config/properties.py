@@ -69,4 +69,5 @@ TOKEN = '03732aff833845903c8d68dd24c79e7c41d6b2f2e8c62ee13c2713e5'
 """
 SOURCE_DIR = 'D:/HUAXIN_FUND/SourceData'  # 源文件目录
 RESULT_DIR = 'D:/HUAXIN_FUND/ResultData'  # 结果文件目录
-RESEARCH_DIR = 'D:/HUAXIN_FUND/ResearchReport'  # 研报文件目录
+RESEARCH_STOCK_DIR = 'D:/HUAXIN_FUND/ResearchReport/STOCK'  # 个股研报文件目录
+RESEARCH_INDUSTRY_DIR = 'D:/HUAXIN_FUND/ResearchReport/INDUSTRY'  # 行业研报文件目录
