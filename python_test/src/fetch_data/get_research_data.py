@@ -33,7 +33,7 @@ def download_industry():
         for x in json_string:
             x_split = x.split(',')
             secuName = x_split[10]
-            title = x_split[9].replace('&sbquo;', '，')
+            title = x_split[9].replace('&sbquo;', '，').replace('/',':')
             date = x_split[1].split(' ')[0].replace('/', '')
             infoCode = x_split[2]
             if os.path.exists('%s/%s-%s-%s.pdf' % (RESEARCH_INDUSTRY_DIR, date, secuName, title)) or os.path.exists('%s/%s-%s-%s.html' % (RESEARCH_INDUSTRY_DIR, date, secuName, title)):
@@ -65,7 +65,7 @@ def download_stock():
         json_string = json.loads(html)
         for x in json_string:
             secuName = x['secuName']
-            title = x['title']
+            title = x['title'].replace('/',':')
             date = x['datetime'].split('T')[0].replace('-', '')
             infoCode = x['infoCode']
             if os.path.exists('%s/%s-%s-%s.pdf' % (RESEARCH_STOCK_DIR, date, secuName, title)) or os.path.exists('%s/%s-%s-%s.html' % (RESEARCH_STOCK_DIR, date, secuName, title)):
