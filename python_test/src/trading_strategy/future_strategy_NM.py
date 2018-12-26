@@ -8,13 +8,13 @@ import pandas as pd
 import numpy as np
 import csv
 from config.properties import SOURCE_DIR
-from config.properties import CODE_COMBINATION, ZCE_CODE, DCE_CODE, SHF_CODE
+from config.properties import CODE_COMBINATION, CODE_COMBINATION2, ZCE_CODE, DCE_CODE, SHF_CODE
 from config.parameter import BEST_N, BEST_NM
 import matplotlib.pyplot as plt
 import datetime
 
 
-def add_close_difference(df, code1, code2):
+def add_close_difference(df, code1, code2, multiple=1):
     """
     合并两个合约，并添加收盘价差价
     """
@@ -24,7 +24,7 @@ def add_close_difference(df, code1, code2):
     df2.columns = ['trade_date', 'close2', 'vol2', 'oi2' ]
     result = pd.merge(df1, df2, on='trade_date', how='inner')
     result[['close1', 'close2', 'vol1', 'vol2', 'oi1', 'oi2']] = result[['close1', 'close2', 'vol1', 'vol2', 'oi1', 'oi2']].apply(pd.to_numeric)
-    result['difference'] = result['close1'] - result['close2']
+    result['difference'] = result['close1'] - result['close2'] * multiple
     return result 
 
 
@@ -42,7 +42,7 @@ def get_code_near_ave(df, N, M):
     N:均线日期
     M:均线邻近区间比率
     """
-    result = []
+    result = [[], [], [], [], []]
     
     all_codes = ZCE_CODE + DCE_CODE + SHF_CODE
     
@@ -52,7 +52,7 @@ def get_code_near_ave(df, N, M):
             df1['ave_close%s' % N] = get_ave_line(df1['close'], N)
             df1['close'] = df1['close'].apply(pd.to_numeric)
             if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['close'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
-                result.append(code)
+                result[0].append(code)
             
     for codes in CODE_COMBINATION:
         code1 = codes[0]
@@ -61,9 +61,30 @@ def get_code_near_ave(df, N, M):
         if df1.shape[0] > 0:
             df1['ave_close%s' % N] = get_ave_line(df1['difference'], N)
             if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
-                result.append(codes)
-    print('%s日均线附近的合约及合约组合：' % N)
-    print(result)
+                result[1].append(codes)
+            if df1['ave_close%s' % N].iat[-1] - 20 < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + 20 :
+                result[2].append(codes)
+                
+    for codes in CODE_COMBINATION2:
+        code1 = codes[0]
+        code2 = codes[1]
+        df1 = add_close_difference(df, code1, code2 , 2)
+        if df1.shape[0] > 0:
+            df1['ave_close%s' % N] = get_ave_line(df1['difference'], N)
+            if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
+                result[3].append(codes)
+            if df1['ave_close%s' % N].iat[-1] - 20 < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + 20 :
+                result[4].append(codes)
+    print('%s日均线附近 %s%% 的合约：' % (N, M * 100))
+    print(result[0])
+    print('%s日均线附近 %s%% 的一一合约组合：' % (N, M * 100))
+    print(result[1])
+    print('%s日均线附近 %s 的一一合约组合：' % (N, 20))
+    print(result[2])
+    print('%s日均线附近 %s%% 的一二合约组合：' % (N, M * 100))
+    print(result[3])
+    print('%s日均线附近 %s 的一二合约组合：' % (N, 20))
+    print(result[4])
     return result
 
 
@@ -178,12 +199,12 @@ if __name__ == '__main__':
     
     strat_date = 20150101
     end_date = 20181231
-#     df_source = df_source[df_source['trade_date'] > strat_date]
+    df_source = df_source[df_source['trade_date'] > strat_date]
     
-    N = 11
+    N = 60
     M = 0.01
     
-#     result_codes = get_code_near_ave(df_source, N, M)
+    result_codes = get_code_near_ave(df_source, N, M)
 
 #     get_code_fit_strategy(df_source)
 #     result_codes = DCE_CODE
@@ -193,6 +214,6 @@ if __name__ == '__main__':
 #         else:
 #             show2(df_source, code[0], code[1], N)
 
-    show1(df_source, 'CF 01', N)
+#     show1(df_source, 'CF 01', N)
 #     show2(df_source, 'C 01', 'C 05', N)
     
