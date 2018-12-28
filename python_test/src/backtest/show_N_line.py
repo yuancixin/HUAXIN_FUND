@@ -7,14 +7,14 @@ Created on 2018年12月6日
 import pandas as pd
 import csv
 from config.properties import RESULT_DIR
-from config.properties import DCE_CODE, SHF_CODE
+from config.properties import ZCE_CODE, DCE_CODE, SHF_CODE
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     df_source = pd.read_csv('%s/N_AVERAGE_RESULT.csv' % RESULT_DIR, quoting=csv.QUOTE_NONE)
     
 #     codes = ['J 01']
-    codes = DCE_CODE + SHF_CODE
+    codes = ZCE_CODE + DCE_CODE + SHF_CODE
     for code in codes:
         df = df_source[df_source['ts_code'] == code]
         plt.subplot(511)

@@ -8,7 +8,7 @@ import pandas as pd
 import csv
 import os
 from config.properties import SOURCE_DIR, RESULT_DIR
-from config.properties import DCE_CODE, SHF_CODE
+from config.properties import ZCE_CODE, DCE_CODE, SHF_CODE
 
 
 def backtest(df, code, N, M):
@@ -34,13 +34,13 @@ def backtest(df, code, N, M):
         nonlocal B_PRICE, hold_num
         B_PRICE = price
         hold_num = capital_available / B_PRICE
-        print('以%s买入' % price)
+#         print('以%s买入' % price)
 
     def sell(price):
         nonlocal S_PRICE, hold_num
         S_PRICE = price
         hold_num = capital_available / S_PRICE
-        print('以%s卖出' % price)
+#         print('以%s卖出' % price)
         
     def unwind(S, B):
         nonlocal capital_available, hold_num, B_PRICE, S_PRICE, trade_num , capital_last, retreat_max , capital_max, capital_min, profit_num
@@ -57,7 +57,7 @@ def backtest(df, code, N, M):
         if retreat < retreat_max:
             retreat_max = retreat
         capital_last = capital_available
-        print('当前总资产%s，S--%s,B--%s' % (capital_available, S, B))
+#         print('当前总资产%s，S--%s,B--%s' % (capital_available, S, B))
         hold_num = 0
         B_PRICE = 0
         S_PRICE = 0
@@ -73,25 +73,25 @@ def backtest(df, code, N, M):
             while(i < df_year.shape[0] - 1):
                 if trade_trend == '平' :
                     if df_year[i:i + 1]['close'].values[0] > df_year[i - N : i]['close'].max():
-                        print('======%s做多======' % df_year[i:i + 1]['trade_date'].values[0])
+#                         print('======%s做多======' % df_year[i:i + 1]['trade_date'].values[0])
                         buy(df_year[i:i + 1]['close'].values[0])
                         trade_trend = '多'
                     elif df_year[i:i + 1]['close'].values[0] < df_year[i - N : i]['close'].min():
-                        print('======%s做空======' % df_year[i:i + 1]['trade_date'].values[0])
+#                         print('======%s做空======' % df_year[i:i + 1]['trade_date'].values[0])
                         sell(df_year[i:i + 1]['close'].values[0])
                         trade_trend = '空'
                     else:
                         pass
                 elif trade_trend == '多' :
                     if df_year[i:i + 1]['close'].values[0] < df_year[i - M : i]['close'].min():
-                        print('======%s平仓======' % df_year[i:i + 1]['trade_date'].values[0])
+#                         print('======%s平仓======' % df_year[i:i + 1]['trade_date'].values[0])
                         unwind(df_year[i:i + 1]['close'].values[0] , B_PRICE)
                         trade_trend = '平'
                     else:
                         pass
                 elif trade_trend == '空':
                     if df_year[i:i + 1]['close'].values[0] > df_year[i - M : i]['close'].max():
-                        print('======%s平仓======' % df_year[i:i + 1]['trade_date'].values[0])
+#                         print('======%s平仓======' % df_year[i:i + 1]['trade_date'].values[0])
                         unwind(S_PRICE , df_year[i:i + 1]['close'].values[0])
                         trade_trend = '平'
                     else:
@@ -102,11 +102,11 @@ def backtest(df, code, N, M):
                 i = i + 1
                 
             if trade_trend == '多':
-                print('======%s因合约结束，平仓======' % df_year[i:i + 1]['trade_date'].values[0])
+#                 print('======%s因合约结束，平仓======' % df_year[i:i + 1]['trade_date'].values[0])
                 unwind(df_year[i:i + 1]['close'].values[0] , B_PRICE)
                 trade_trend = '平'
             elif trade_trend == '空':
-                print('======%s因合约结束，平仓======' % df_year[i:i + 1]['trade_date'].values[0])
+#                 print('======%s因合约结束，平仓======' % df_year[i:i + 1]['trade_date'].values[0])
                 unwind(S_PRICE , df_year[i:i + 1]['close'].values[0])
                 trade_trend = '平'
             else:
@@ -120,14 +120,15 @@ if __name__ == '__main__':
     
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-    backtest(df_source, 'CS 01', 11, 1)
+#     backtest(df_source, 'CS 01', 11, 1)
     
-#     codes = SHF_CODE + DCE_CODE
-#     for code in codes:
-#         result_list = []
-#         for N in range(10, 101, 1):
-#             for M in range(1, N + 1, 1):
-#                 result_list.append(backtest(df_source, code, N, M))
-#         df_result = pd.DataFrame(result_list, columns=('ts_code', 'N', 'M', 'trade_num', 'profit_num', 'retreat_max', 'capital_available', 'capital_max', 'capital_min'))  # 生成空的pandas表
-#         df_result.to_csv('%s/NM_BREAKTHROUGH_RESULT.csv' % RESULT_DIR, header=not os.path.exists('%s/NM_BREAKTHROUGH_RESULT.csv' % RESULT_DIR), mode='a', index=0, encoding='utf-8')
+#     codes = ZCE_CODE + SHF_CODE + DCE_CODE
+    codes = ZCE_CODE
+    for code in codes:
+        result_list = []
+        for N in range(10, 101, 1):
+            for M in range(1, N + 1, 1):
+                result_list.append(backtest(df_source, code, N, M))
+        df_result = pd.DataFrame(result_list, columns=('ts_code', 'N', 'M', 'trade_num', 'profit_num', 'retreat_max', 'capital_available', 'capital_max', 'capital_min'))  # 生成空的pandas表
+        df_result.to_csv('%s/NM_BREAKTHROUGH_RESULT.csv' % RESULT_DIR, header=not os.path.exists('%s/NM_BREAKTHROUGH_RESULT.csv' % RESULT_DIR), mode='a', index=0, encoding='utf-8')
             

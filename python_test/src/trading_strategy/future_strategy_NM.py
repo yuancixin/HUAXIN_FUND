@@ -36,7 +36,7 @@ def get_ave_line(column, N):
     return np.round(pd.Series.rolling(column, window=N).mean(), 2)
 
 
-def get_code_near_ave(df, N, M):
+def get_code_near_ave(df, N, M, D = 20):
     """
     获取N日均线附近的合约及合约组合
     N:均线日期
@@ -62,7 +62,7 @@ def get_code_near_ave(df, N, M):
             df1['ave_close%s' % N] = get_ave_line(df1['difference'], N)
             if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
                 result[1].append(codes)
-            if df1['ave_close%s' % N].iat[-1] - 20 < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + 20 :
+            if df1['ave_close%s' % N].iat[-1] - D < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + D :
                 result[2].append(codes)
                 
     for codes in CODE_COMBINATION2:
@@ -73,17 +73,17 @@ def get_code_near_ave(df, N, M):
             df1['ave_close%s' % N] = get_ave_line(df1['difference'], N)
             if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
                 result[3].append(codes)
-            if df1['ave_close%s' % N].iat[-1] - 20 < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + 20 :
+            if df1['ave_close%s' % N].iat[-1] - D < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + D :
                 result[4].append(codes)
     print('%s日均线附近 %s%% 的合约：' % (N, M * 100))
     print(result[0])
     print('%s日均线附近 %s%% 的一一合约组合：' % (N, M * 100))
     print(result[1])
-    print('%s日均线附近 %s 的一一合约组合：' % (N, 20))
+    print('%s日均线附近 %s 的一一合约组合：' % (N, D))
     print(result[2])
     print('%s日均线附近 %s%% 的一二合约组合：' % (N, M * 100))
     print(result[3])
-    print('%s日均线附近 %s 的一二合约组合：' % (N, 20))
+    print('%s日均线附近 %s 的一二合约组合：' % (N, D))
     print(result[4])
     return result
 
@@ -203,8 +203,9 @@ if __name__ == '__main__':
     
     N = 60
     M = 0.01
+    D = 20
     
-    result_codes = get_code_near_ave(df_source, N, M)
+    result_codes = get_code_near_ave(df_source, N, M ,D)
 
 #     get_code_fit_strategy(df_source)
 #     result_codes = DCE_CODE
