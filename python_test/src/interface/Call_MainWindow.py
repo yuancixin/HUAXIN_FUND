@@ -1,16 +1,18 @@
 import sys
+import pandas as pd
+import csv 
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from interface.UI_MainWindow import Ui_MainWindow
-import pandas as pd
-import csv 
+from interface.MatplotlibWidget import MatplotlibWidget
 from config.properties import SOURCE_DIR
 import fetch_data.get_future_data
 import fetch_data.get_stock_data
 import fetch_data.get_actual_price
 import fetch_data.get_research_data
 import trading_strategy.future_strategy_NM
+import trading_strategy.future_strategy_difference
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -23,6 +25,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.input_future_m.setValue(0.010)
         self.input_future_d.setValue(20)
         
+        self.input_future_diff_code.setText('JD 05')
+        self.input_future_comb_code1.setText('JD 01')
+        self.input_future_comb_code2.setText('JD 05')
+        self.input_future_comb_n.setValue(60)
+        
         self.button_update.clicked.connect(self.update_start)
         self.button_clearlog.clicked.connect(self.clearlog)
         self.button_future_strategy.clicked.connect(self.future_strategy_start)
@@ -33,6 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def update_start(self):
         self.button_update.setEnabled(False)
+        self.button_update.setText('请稍等...')
         self.label_update_state.setText('数据正在更新中')
         self.Update_thread = UpdateThread(self.check_update_future, self.check_update_stock, self.check_update_actual, self.check_update_research)
         self.Update_thread.UpdateEndSignal.connect(self.update_end)
@@ -40,6 +48,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
     def update_end(self):
         self.button_update.setEnabled(True)
+        self.button_update.setText('更新')
         self.label_update_state.setText('数据更新完成')
         QtWidgets.QMessageBox.information(self.button_update, "提示", "数据更新完成")
         
@@ -48,12 +57,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
     def future_strategy_start(self):
         self.button_future_strategy.setEnabled(False)
-        self.Strategy_Future_Thread = StrategyFutureThread(self.check_fut_ave, self.check_fut_nm, self.input_future_n.value(), self.input_future_m.value(), self.input_future_d.value())
+        self.button_future_strategy.setText('请稍等...')
+        self.Strategy_Future_Thread = StrategyFutureThread(self.check_fut_ave, self.check_fut_nm, self.check_fut_different, self.check_fut_comb,
+                                                           self.input_future_n.value(), self.input_future_m.value(), self.input_future_d.value(),
+                                                           self.input_future_diff_code.text(), self.input_future_comb_code1.text(), self.input_future_comb_code2.text(), self.input_future_comb_n.value()
+                                                           )
         self.Strategy_Future_Thread.StrategyFutureEndSignal.connect(self.future_strategy_end)
+        self.Strategy_Future_Thread.StrategyCheckFutDifferentSignal.connect(self.show_future_difference) 
+        self.Strategy_Future_Thread.StrategyCheckFutCombSignal.connect(self.show_future_nm) 
         self.Strategy_Future_Thread.start()
+    
+    def show_future_difference(self, name, x, y):
+        ui = MatplotlibWidget()
+        ui.mpl.show_strategy_difference(name, x, y)
+        ui.show()
+        
+    def show_future_nm(self, code1, code2, N, x, y11, y12, y21, y22, y31, y32):
+        ui = MatplotlibWidget()
+        ui.mpl.show_strategy_nm(code1, code2, N, x, y11, y12, y21, y22, y31, y32)
+        ui.show()
         
     def future_strategy_end(self):
         self.button_future_strategy.setEnabled(True)
+        self.button_future_strategy.setText('策略查找')
 
     def outputWritten(self, text):  
         cursor = self.LogInfoBrowser.textCursor()  # 光标
@@ -65,21 +91,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 class StrategyFutureThread(QThread):
     StrategyFutureEndSignal = pyqtSignal()
+    StrategyCheckFutDifferentSignal = pyqtSignal(str, list, list)
+    StrategyCheckFutCombSignal = pyqtSignal(str, str, str, list, list, list, list, list, list, list)
     
-    def __init__(self, check_fut_ave, check_fut_nm, input_future_n, input_future_m, input_future_d, parent=None):
+    def __init__(self, check_fut_ave, check_fut_nm, check_fut_different, check_fut_comb,
+                 input_future_n, input_future_m, input_future_d,
+                 input_future_diff_code, input_future_comb_code1, input_future_comb_code2, input_future_comb_n,
+                 parent=None):
         super(StrategyFutureThread, self).__init__(parent)
         self.check_fut_ave = check_fut_ave
         self.check_fut_nm = check_fut_nm
+        self.check_fut_different = check_fut_different
+        self.check_fut_comb = check_fut_comb
+        
         self.input_future_n = input_future_n
         self.input_future_m = input_future_m
         self.input_future_d = input_future_d
+        
+        self.input_future_diff_code = input_future_diff_code
+        self.input_future_comb_code1 = input_future_comb_code1
+        self.input_future_comb_code2 = input_future_comb_code2
+        self.input_future_comb_n = input_future_comb_n
 
     def run(self):
         df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
         if self.check_fut_ave.isChecked():
             trading_strategy.future_strategy_NM.get_code_near_ave(df_source, self.input_future_n, self.input_future_m, self.input_future_d)
+        
         if self.check_fut_nm.isChecked():
             trading_strategy.future_strategy_NM.get_code_fit_strategy(df_source)  
+        
+        if self.check_fut_different.isChecked():
+            x, y = trading_strategy.future_strategy_difference.get_difference(df_source, self.input_future_diff_code)
+            self.StrategyCheckFutDifferentSignal.emit(self.input_future_diff_code, x, y)
+            
+        if self.check_fut_comb.isChecked():
+            x, y11, y12, y21, y22, y31, y32 = trading_strategy.future_strategy_NM.show2(df_source, self.input_future_comb_code1, self.input_future_comb_code2, self.input_future_comb_n)
+            self.StrategyCheckFutCombSignal.emit(self.input_future_comb_code1, self.input_future_comb_code2, str(self.input_future_comb_n), x, y11, y12, y21, y22, y31, y32)
+        
         self.StrategyFutureEndSignal.emit()
 
 

@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
 encoding//src/interface/UI_MainWindow.py=utf-8
+encoding//src/interface/call_matplotlib.py=utf-8
 encoding//src/test/test11.py=utf-8
 encoding//src/test/test3.py=utf-8
+encoding//src/test/ui.py=utf-8

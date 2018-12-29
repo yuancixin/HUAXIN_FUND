@@ -21,13 +21,16 @@ def get_difference(df, code):
     df_difference['ave_price'] = df_difference['ave_price'] * 1000
     df_difference['trade_date'] = df_difference['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x), '%Y%m%d'))
     df_difference['difference'] = df_difference['ave_price'] - df_difference['close']
-    print(df_difference)
-    plt.plot(df_difference['trade_date'], df_difference['difference'], c='red', label='difference')
-    plt.show()
+#     print(df_difference)
+#     plt.plot(df_difference['trade_date'], df_difference['difference'], c='red', label='difference')
+#     plt.show()
+    return df_difference['trade_date'].tolist(), df_difference['difference'].tolist()
     
 
 if __name__ == '__main__':
     
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     code = 'JD 03'
-    get_difference(df_source, code)
+    x, y = get_difference(df_source, code)
+#     print(x)
+    print(y)

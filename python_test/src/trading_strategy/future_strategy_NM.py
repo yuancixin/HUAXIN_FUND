@@ -36,7 +36,7 @@ def get_ave_line(column, N):
     return np.round(pd.Series.rolling(column, window=N).mean(), 2)
 
 
-def get_code_near_ave(df, N, M, D = 20):
+def get_code_near_ave(df, N, M, D=20):
     """
     获取N日均线附近的合约及合约组合
     N:均线日期
@@ -53,6 +53,9 @@ def get_code_near_ave(df, N, M, D = 20):
             df1['close'] = df1['close'].apply(pd.to_numeric)
             if df1['ave_close%s' % N].iat[-1] * (1 - M) < df1['close'].iat[-1] < df1['ave_close%s' % N].iat[-1] * (1 + M) :
                 result[0].append(code)
+    
+    print('%s日均线附近 %s%% 的合约：' % (N, M * 100))
+    print(result[0])
             
     for codes in CODE_COMBINATION:
         code1 = codes[0]
@@ -64,6 +67,11 @@ def get_code_near_ave(df, N, M, D = 20):
                 result[1].append(codes)
             if df1['ave_close%s' % N].iat[-1] - D < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + D :
                 result[2].append(codes)
+    
+    print('%s日均线附近 %s%% 的一一合约组合：' % (N, M * 100))
+    print(result[1])
+    print('%s日均线附近 %s 的一一合约组合：' % (N, D))
+    print(result[2])
                 
     for codes in CODE_COMBINATION2:
         code1 = codes[0]
@@ -75,12 +83,7 @@ def get_code_near_ave(df, N, M, D = 20):
                 result[3].append(codes)
             if df1['ave_close%s' % N].iat[-1] - D < df1['difference'].iat[-1] < df1['ave_close%s' % N].iat[-1] + D :
                 result[4].append(codes)
-    print('%s日均线附近 %s%% 的合约：' % (N, M * 100))
-    print(result[0])
-    print('%s日均线附近 %s%% 的一一合约组合：' % (N, M * 100))
-    print(result[1])
-    print('%s日均线附近 %s 的一一合约组合：' % (N, D))
-    print(result[2])
+    
     print('%s日均线附近 %s%% 的一二合约组合：' % (N, M * 100))
     print(result[3])
     print('%s日均线附近 %s 的一二合约组合：' % (N, D))
@@ -102,7 +105,10 @@ def get_code_fit_strategy(df):
         df_code['difference'] = df_code['close'] - df_code['ave_close%s' % N]
         if df_code[-1:]['difference'].values[0] * df_code[-2:-1]['difference'].values[0] <= 0:
             result_N.append(code)
-
+    
+    print('符合N策略的合约：')
+    print(result_N)
+    
     for x in BEST_NM:
         code = x[0]
         N = x[1]
@@ -142,9 +148,7 @@ def get_code_fit_strategy(df):
             else:
                 if df_year[-1:]['close'].values[0] < df_year[-1 - M :-1]['close'].min() or df_year[-1:]['close'].values[0] > df_year[-1 - M :-1]['close'].max():
                     result_NM[1].append(code)
-                
-    print('符合N策略的合约：')
-    print(result_N)
+
     print('符合NM策略入场的合约：')
     print(result_NM[0])
     print('符合NM策略离场的合约：')
@@ -170,27 +174,27 @@ def show2(df, code1, code2, N):
     """
     展示两份合约成交量、持仓量、差价及N日差价
     """
-    print(code1, code2)
     result = add_close_difference(df, code1, code2)
     result['trade_date'] = result['trade_date'].apply(lambda x: datetime.datetime.strptime(str(x), '%Y%m%d'))
     result['ave_difference%s' % N] = get_ave_line(result['difference'], N)
     result['ave_close1%s' % N] = get_ave_line(result['close1'], N)
     result['ave_close2%s' % N] = get_ave_line(result['close2'], N)
-    plt.figure(1)
-    plt.subplot(311)
-    plt.plot(result['trade_date'], result['difference'], c='red', label='difference')
-    plt.plot(result['trade_date'], result['ave_difference%s' % N], c='blue', label='ave_difference%s' % N)
-    plt.legend(loc='upper left')
-    plt.subplot(312)
-    plt.plot(result['trade_date'], result['oi1'], c='red', label='oi1')
-    plt.plot(result['trade_date'], result['oi2'], c='blue', label='oi2')
-    plt.legend(loc='upper left')
-    plt.subplot(313)
-    plt.plot(result['trade_date'], result['vol1'], c='red', label='vol1')
-    plt.plot(result['trade_date'], result['vol2'], c='blue', label='vol2')
-    plt.legend(loc='upper left')
-    plt.suptitle('%s and %s (N=%s)' % (code1, code2, N))
-    plt.show()
+#     plt.figure(1)
+#     plt.subplot(311)
+#     plt.plot(result['trade_date'], result['difference'], c='red', label='difference')
+#     plt.plot(result['trade_date'], result['ave_difference%s' % N], c='blue', label='ave_difference%s' % N)
+#     plt.legend(loc='upper left')
+#     plt.subplot(312)
+#     plt.plot(result['trade_date'], result['oi1'], c='red', label='oi1')
+#     plt.plot(result['trade_date'], result['oi2'], c='blue', label='oi2')
+#     plt.legend(loc='upper left')
+#     plt.subplot(313)
+#     plt.plot(result['trade_date'], result['vol1'], c='red', label='vol1')
+#     plt.plot(result['trade_date'], result['vol2'], c='blue', label='vol2')
+#     plt.legend(loc='upper left')
+#     plt.suptitle('%s and %s (N=%s)' % (code1, code2, N))
+#     plt.show()
+    return result['trade_date'].tolist(), result['difference'].tolist(), result['ave_difference%s' % N].tolist(), result['oi1'].tolist(), result['oi2'].tolist(), result['vol1'].tolist(), result['vol2'].tolist()
 
 
 if __name__ == '__main__':
@@ -205,7 +209,7 @@ if __name__ == '__main__':
     M = 0.01
     D = 20
     
-    result_codes = get_code_near_ave(df_source, N, M ,D)
+#     result_codes = get_code_near_ave(df_source, N, M , D)
 
 #     get_code_fit_strategy(df_source)
 #     result_codes = DCE_CODE
@@ -215,6 +219,6 @@ if __name__ == '__main__':
 #         else:
 #             show2(df_source, code[0], code[1], N)
 
-#     show1(df_source, 'CF 01', N)
-#     show2(df_source, 'C 01', 'C 05', N)
+    show1(df_source, 'CF 01', N)
+    show2(df_source, 'C 01', 'C 05', N)
     
