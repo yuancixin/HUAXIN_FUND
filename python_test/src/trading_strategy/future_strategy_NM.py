@@ -211,7 +211,7 @@ if __name__ == '__main__':
     
 #     result_codes = get_code_near_ave(df_source, N, M , D)
 
-#     get_code_fit_strategy(df_source)
+    get_code_fit_strategy(df_source)
 #     result_codes = DCE_CODE
 #     for code in result_codes:
 #         if isinstance(code, str):
@@ -219,6 +219,6 @@ if __name__ == '__main__':
 #         else:
 #             show2(df_source, code[0], code[1], N)
 
-    show1(df_source, 'CF 01', N)
-    show2(df_source, 'C 01', 'C 05', N)
+#     show1(df_source, 'CF 01', N)
+#     show2(df_source, 'C 01', 'C 05', N)
     
