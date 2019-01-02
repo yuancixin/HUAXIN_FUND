@@ -35,14 +35,15 @@ def get_JD_price():
     html = res.read().decode("gb2312", "ignore")
     soup = BeautifulSoup(html, "html.parser")
     title = soup.title.get_text()
-    date_now = datetime.datetime.now().strftime('%Y{y}%m{m}%d{d}').format(y='年',m='月',d='日')
-    
-    if date_now in title:
+    date_now1 = datetime.datetime.now().strftime('%Y{y}%m{m}%d{d}').format(y='年', m='月', d='日')
+    now = datetime.datetime.now().timetuple()
+    date_now2 = '%s年%s月%s日' % (str(now.tm_year), str(now.tm_mon), str(now.tm_mday))
+    if date_now1 in title or date_now2 in title:
         p_list = soup.find('div', id='content').find_all('p')
         price_list = []
         for i in p_list:
             if '德州-' in i.get_text():
-                price =  i.get_text().split('参考价')[1].split('-')[0].replace('涨', '').replace('降', '')
+                price = i.get_text().split('参考价')[1].split('-')[0].replace('涨', '').replace('降', '')
                 price_list.append(float(price))
             
         price_sum = 0

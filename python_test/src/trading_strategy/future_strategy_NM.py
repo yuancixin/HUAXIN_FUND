@@ -144,10 +144,10 @@ def get_code_fit_strategy(df):
                 i = i + 1
             if trade_trend == '平':
                 if df_year[-1:]['close'].values[0] > df_year[-1 - N :-1]['close'].max() or df_year[-1:]['close'].values[0] < df_year[-1 - N :-1]['close'].min():
-                    result_NM[0].append(code)
+                    result_NM[0].append('%s-%s-%s' % (code, N, M))
             else:
                 if df_year[-1:]['close'].values[0] < df_year[-1 - M :-1]['close'].min() or df_year[-1:]['close'].values[0] > df_year[-1 - M :-1]['close'].max():
-                    result_NM[1].append(code)
+                    result_NM[1].append('%s-%s-%s' % (code, N, M))
 
     print('符合NM策略入场的合约：')
     print(result_NM[0])

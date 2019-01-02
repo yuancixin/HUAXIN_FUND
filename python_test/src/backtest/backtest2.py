@@ -120,10 +120,20 @@ if __name__ == '__main__':
     
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-#     backtest(df_source, 'CS 01', 11, 1)
+#     backtest(df_source, 'RM 11', 11, 11)
     
 #     codes = ZCE_CODE + SHF_CODE + DCE_CODE
-    codes = ZCE_CODE
+    codes = ['RM 11', 'HC 01', 'CU 03', 'NI 06', 'WH 09', 'HC 10', 'NI 05', 'SC 06', 'CU 09', 'HC 05', 'ZC 05', 'PB 10', 'AP 09', 
+             'BU 01', 'ZN 02', 'AP 12', 'NI 02', 'Y 01', 'PB 09', 'SC 09', 'CU 01', 'AL 01', 'RM 05', 'SC 04', 'AL 02', 'TA 01', 
+             'CU 05', 'BU 12', 'AP 08', 'ZN 12', 'AG 06', 'AP 01', 'NI 11', 'SC 12', 'TA 07', 'CU 06', 'PB 11', 'AP 04', 'PB 05', 
+             'SC 10', 'ZC 01', 'EG 09', 'PB 02', 'NI 04', 'AP 06', 'PB 12', 'SR 01', 'CU 12', 'AL 07', 'AL 06', 'NI 03', 'AL 09', 
+             'ZN 11', 'Y 05', 'SN 05', 'AP 11', 'SC 03', 'ZN 03', 'NI 08', 'NI 10', 'M 11', 'CU 07', 'PB 01', 'AP 03', 'NI 01', 
+             'PB 03', 'AL 10', 'FG 09', 'PB 07', 'AL 08', 'SP 06', 'ZN 09', 'EG 05', 'AL 11', 'PB 08', 'SC 02', 'M 03', 'FU 09', 
+             'WH 05', 'SM 05', 'FG 01', 'MA 05', 'AL 04', 'FU 01', 'AL 03', 'SR 05', 'ZC 09', 'MA 01', 'FG 05', 'NI 07', 'SN 01', 
+             'AL 12', 'ZN 01', 'CU 02', 'MA 09', 'OI 09', 'ZN 07', 'ZN 10', 'SC 01', 'SP 09', 'AP 07', 'BU 09', 'SC 07', 'BU 06', 
+             'AU 12', 'CU 11', 'Y 09', 'TA 09', 'RM 09', 'AP 10', 'SM 01', 'NI 12', 'SC 05', 'OI 05', 'OI 01', 'AP 05', 'AU 06', 
+             'SF 05', 'FU 05', 'SF 01', 'EG 01', 'SF 09', 'ZN 06', 'AG 12', 'ZN 04', 'CU 04', 'SC 11', 'NI 09', 'SN 09', 'AP 02', 
+             'AL 05', 'ZN 05', 'WH 01', 'CU 10', 'TA 03', 'CU 08', 'SR 09', 'ZN 08', 'PB 06', 'SC 08', 'SM 09', 'PB 04', 'TA 05']
     for code in codes:
         result_list = []
         for N in range(10, 101, 1):

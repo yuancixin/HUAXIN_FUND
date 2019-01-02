@@ -53,6 +53,7 @@ def update_daily():
     """
     df_source = pd.read_csv('%s/stock_daily_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
+#     start_date = '20180101'
     start_date = str(df_source['trade_date'].max())
     end_date = datetime.datetime.now().strftime('%Y%m%d')
     
@@ -81,6 +82,7 @@ def update_basic():
     """
     df_source = pd.read_csv('%s/stock_daily_basic.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
+#     start_date = '20180101'
     start_date = str(df_source['trade_date'].max())
     end_date = datetime.datetime.now().strftime('%Y%m%d')
     

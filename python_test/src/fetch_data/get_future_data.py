@@ -51,11 +51,11 @@ def main():
     """
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-#     start_date = str(df_source['trade_date'].max())
-    start_date = '20180101'
+    start_date = str(df_source['trade_date'].max())
+#     start_date = '20180101'
     end_date = datetime.datetime.now().strftime('%Y%m%d')
 #     year_code = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
-    year_code = ['18','19', '20']
+    year_code = ['18', '19', '20']
     
     if start_date == end_date:
         print('---期货数据已是最新---')
@@ -72,6 +72,13 @@ def main():
         df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
         df_source.sort_values(by=['ts_code', 'trade_date', 'year'], ascending=(True, True, True), inplace=True)
         df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
+        print('---期货数据去重完成,正在进行缺失值填充!---')
+        for i in range(0, len(df_source)):
+            if pd.isnull(df_source.loc[i, 'close']):
+                if i > 0:
+                    df_source.loc[i, 'close'] = df_source.loc[i - 1, 'close']
+                else:
+                    df_source.loc[i, 'close'] = 0
         df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
         print('---期货数据已是最新---')
 
