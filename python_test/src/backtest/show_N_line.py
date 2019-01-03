@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     df_source = pd.read_csv('%s/N_AVERAGE_RESULT.csv' % RESULT_DIR, quoting=csv.QUOTE_NONE)
     
-#     codes = ['J 01']
-    codes = ZCE_CODE + DCE_CODE + SHF_CODE
+    codes = ['J 01']
+#     codes = ZCE_CODE + DCE_CODE + SHF_CODE
     for code in codes:
         df = df_source[df_source['ts_code'] == code]
         plt.subplot(511)
