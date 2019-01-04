@@ -11,7 +11,7 @@ def show_nm(df, code, N):
     plt.plot(df_code['M'], df_code['capital_max'], c='blue', label='capital_max')
     plt.plot(df_code['M'], df_code['capital_min'], c='green', label='capital_min')
     plt.legend(loc='upper left')
-    
+    plt.suptitle('%s (N=%s)' % (code, N))
     plt.show()
 
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     
     df_source = pd.read_csv('%s/NM_BREAKTHROUGH_RESULT.csv' % RESULT_DIR, quoting=csv.QUOTE_NONE)
     
-    code = 'RU 01'
+    code = 'J 09'
     N = 40
     
     show_nm(df_source, code, N)

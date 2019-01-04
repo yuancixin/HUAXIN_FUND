@@ -45,42 +45,70 @@ def get_all_daily(pro, start_date, end_date, year_code):
     return result
 
 
+def get_trade_cal(pro, start_date, end_date):
+    """
+    获取各大期货交易所交易日历数据
+    """
+    trade_days = pro.trade_cal(exchange='DCE', start_date=start_date, end_date=end_date)
+    return trade_days[trade_days['is_open'] == 1]['cal_date']
+
+
+def get_day_daily(pro, trade_date):
+    """
+    获取某日所有期货的日线行情
+    """
+    df = pro.fut_daily(trade_date=trade_date, exchange='', fields='ts_code,trade_date,close,oi,vol')
+    df['ts_code'] = df['ts_code'].apply(lambda x: x.split('.')[0])
+    df = df[df['ts_code'].str.len() > 4]
+    df['year'] = df['ts_code'].str[-4:-2].apply(pd.to_numeric)
+    df['ts_code'] = df['ts_code'].str.slice_replace(-4, -2, " ")
+    code = ZCE_CODE + DCE_CODE + SHF_CODE
+    df = df[df["ts_code"].isin(code)]
+    return df
+
+
+def clean_data():
+    """
+    数据去重、缺失值填充
+    """
+    print('---开始数据去重!---')
+    df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
+    df_source.sort_values(by=['ts_code', 'trade_date', 'year'], ascending=(True, True, True), inplace=True)
+    df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
+    df_source = df_source.reset_index(drop=True)
+    print('---期货数据去重完成---')
+    print('---开始缺失值填充!---')
+    for i in range(0, len(df_source)):
+        if pd.isnull(df_source.loc[i, 'close']):
+            if i > 0:
+                df_source.loc[i, 'close'] = df_source.loc[i - 1, 'close']
+            else:
+                df_source.loc[i, 'close'] = 0
+    df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
+
+
 def main():
     """
     期货数据接口每分钟最多调用120次，单次最大2000条，总量不限制。注意设定好调用频率
     """
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
     
-#     start_date = str(df_source['trade_date'].max())
-    start_date = '20180101'
+    start_date = str(df_source['trade_date'].max())
+#     start_date = '20180101'
     end_date = datetime.datetime.now().strftime('%Y%m%d')
-#     year_code = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
-    year_code = ['19', '20']
     
     if start_date == end_date:
         print('---期货数据已是最新---')
     else:
-        print('---开始更新期货数据！---')
-        pro = ts.pro_api(TOKEN)  # 设定TOKEN
-        for year in year_code:
-            print('%s开始' % year)
-            result = get_all_daily(pro, start_date, end_date, year)
-            result.to_csv('%s/future_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/future_data.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')
-            if not year_code[len(year_code) - 1] == year:
-                time.sleep(60)
-        print('---期货数据更新完成,正在进行数据去重!---')
-        df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
-        df_source.sort_values(by=['ts_code', 'trade_date', 'year'], ascending=(True, True, True), inplace=True)
-        df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
-        df_source = df_source.reset_index(drop=True)
-        print('---期货数据去重完成,正在进行缺失值填充!---')
-        for i in range(0, len(df_source)):
-            if pd.isnull(df_source.loc[i, 'close']):
-                if i > 0:
-                    df_source.loc[i, 'close'] = df_source.loc[i - 1, 'close']
-                else:
-                    df_source.loc[i, 'close'] = 0
-        df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
+        print('---开始爬取期货数据！---')
+        pro = ts.pro_api(TOKEN)  # 设定TOKEN      
+        trade_days = get_trade_cal(pro, start_date, end_date)
+        for trade_date in trade_days:
+            print('%s爬取开始' % trade_date)
+            daily_data = get_day_daily(pro, trade_date)
+            daily_data.to_csv('%s/future_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/future_data.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')
+        print('---期货数据爬取完成---')
+        clean_data()
         print('---期货数据已是最新---')
 
 
