@@ -31,20 +31,29 @@ def download_industry():
             x_split = x.split(',')
             secuName = x_split[10]
             title = x_split[9].replace('&sbquo;', '，').replace('&quot;', '').replace('/', '：').replace(':', '：')
-            date = x_split[1].split(' ')[0].replace('/', '')
+            date_str = x_split[1].split(' ')[0]
+            date_split = date_str.split('/')
+            date = ''
+            for i in date_split:
+                if len(i) < 2:
+                    i = '0' + i
+                date = date + i
             infoCode = x_split[2]
             if os.path.exists('%s/%s-%s-%s.pdf' % (RESEARCH_INDUSTRY_DIR, date, secuName, title)) or os.path.exists('%s/%s-%s-%s.html' % (RESEARCH_INDUSTRY_DIR, date, secuName, title)):
                 continue
             print('正在下载%s-%s-%s' % (date, secuName, title)) 
-            res = urllib.request.urlopen("http://data.eastmoney.com/report/%s/hy,%s.html" % (date, infoCode))
-            html = res.read().decode("gb2312", "ignore")
-            soup = BeautifulSoup(html, "html.parser")
-            link = soup.find_all('a', href=re.compile('pdf'))
-            if len(link) > 0:
-                urllib.request.urlretrieve(link[0]['href'], '%s/%s-%s-%s.pdf' % (RESEARCH_INDUSTRY_DIR, date, secuName, title))
-            else:
-                save('%s/%s-%s-%s.html' % (RESEARCH_INDUSTRY_DIR, date, secuName, title), soup.find('div', class_='newsContent').__str__()) 
-    print('---下载完成---')
+            try:
+                res = urllib.request.urlopen("http://data.eastmoney.com/report/%s/hy,%s.html" % (date, infoCode))
+                html = res.read().decode("gb2312", "ignore")
+                soup = BeautifulSoup(html, "html.parser")
+                link = soup.find_all('a', href=re.compile('pdf'))
+                if len(link) > 0:
+                    urllib.request.urlretrieve(link[0]['href'], '%s/%s-%s-%s.pdf' % (RESEARCH_INDUSTRY_DIR, date, secuName, title))
+                else:
+                    save('%s/%s-%s-%s.html' % (RESEARCH_INDUSTRY_DIR, date, secuName, title), soup.find('div', class_='newsContent').__str__()) 
+            except:
+                print('---下载失败---')
+    print('---行业研报下载完成---')
     
 
 def download_stock():
@@ -64,15 +73,18 @@ def download_stock():
             if os.path.exists('%s/%s-%s-%s.pdf' % (RESEARCH_STOCK_DIR, date, secuName, title))  or os.path.exists('%s/%s-%s-%s.html' % (RESEARCH_STOCK_DIR, date, secuName, title)) :
                 continue
             print('正在下载%s-%s-%s' % (date, secuName, title))
-            res = urllib.request.urlopen("http://data.eastmoney.com/report/%s/%s.html" % (date, infoCode))
-            html = res.read().decode("gb2312", "ignore")
-            soup = BeautifulSoup(html, "html.parser")
-            link = soup.find_all('a', href=re.compile('pdf'))
-            if len(link) > 0:
-                urllib.request.urlretrieve(link[0]['href'], '%s/%s-%s-%s.pdf' % (RESEARCH_STOCK_DIR, date, secuName, title))
-            else:
-                save('%s/%s-%s-%s.html' % (RESEARCH_STOCK_DIR, date, secuName, title), soup.find('div', class_='newsContent').__str__()) 
-    print('---下载完成---')
+            try:
+                res = urllib.request.urlopen("http://data.eastmoney.com/report/%s/%s.html" % (date, infoCode))
+                html = res.read().decode("gb2312", "ignore")
+                soup = BeautifulSoup(html, "html.parser")
+                link = soup.find_all('a', href=re.compile('pdf'))
+                if len(link) > 0:
+                    urllib.request.urlretrieve(link[0]['href'], '%s/%s-%s-%s.pdf' % (RESEARCH_STOCK_DIR, date, secuName, title))
+                else:
+                    save('%s/%s-%s-%s.html' % (RESEARCH_STOCK_DIR, date, secuName, title), soup.find('div', class_='newsContent').__str__()) 
+            except:
+                print('---下载失败---')
+    print('---个股研报下载完成---')
 
 
 def main():

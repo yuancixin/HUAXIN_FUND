@@ -116,11 +116,16 @@ class StrategyFutureThread(QThread):
     def run(self):
         df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
         if self.check_fut_ave.isChecked():
-            trading_strategy.future_strategy_NM.get_code_near_ave(df_source, self.input_future_n, self.input_future_m, self.input_future_d)
-        
+            try:
+                trading_strategy.future_strategy_NM.get_code_near_ave(df_source, self.input_future_n, self.input_future_m, self.input_future_d)
+            except:
+                print('均线策略执行失败，请检查原因')
+            
         if self.check_fut_nm.isChecked():
-            trading_strategy.future_strategy_NM.get_code_fit_strategy(df_source)  
-        
+            try:
+                trading_strategy.future_strategy_NM.get_code_fit_strategy(df_source)  
+            except:
+                print('NM策略执行失败，请检查原因')
         if self.check_fut_different.isChecked():
             x, y = trading_strategy.future_strategy_difference.get_difference(df_source, self.input_future_diff_code)
             self.StrategyCheckFutDifferentSignal.emit(self.input_future_diff_code, x, y)
@@ -144,13 +149,25 @@ class UpdateThread(QThread):
     
     def run(self):
         if self.check_update_future.isChecked():
-            fetch_data.get_future_data.main()
-        if self.check_update_stock.isChecked():   
-            fetch_data.get_stock_data.main()
+            try:
+                fetch_data.get_future_data.main()
+            except:
+                print('期货数据更新失败，请检查原因')
+        if self.check_update_stock.isChecked():  
+            try: 
+                fetch_data.get_stock_data.main()
+            except:
+                print('股票数据更新失败，请检查原因')
         if self.check_update_actual.isChecked():
-            fetch_data.get_actual_price.main()
+            try:
+                fetch_data.get_actual_price.main()
+            except:
+                print('基差数据更新失败，请检查原因')
         if self.check_update_research.isChecked():
-            fetch_data.get_research_data.main()
+            try:
+                fetch_data.get_research_data.main()
+            except:
+                print('研报数据更新失败，请检查原因')
         self.UpdateEndSignal.emit()
 
 

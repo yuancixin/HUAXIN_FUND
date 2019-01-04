@@ -124,7 +124,7 @@ if __name__ == '__main__':
     
 #     codes = ZCE_CODE + SHF_CODE + DCE_CODE
     codes = [
-             'AL 03', 'SR 05', 'ZC 09', 'MA 01', 'FG 05', 'NI 07', 'SN 01', 
+             'SR 05', 'ZC 09', 'MA 01', 'FG 05', 'NI 07', 'SN 01', 
              'AL 12', 'ZN 01', 'CU 02', 'MA 09', 'OI 09', 'ZN 07', 'ZN 10', 'SC 01', 'SP 09', 'AP 07', 'BU 09', 'SC 07', 'BU 06', 
              'AU 12', 'CU 11', 'Y 09', 'TA 09', 'RM 09', 'AP 10', 'SM 01', 'NI 12', 'SC 05', 'OI 05', 'OI 01', 'AP 05', 'AU 06', 
              'SF 05', 'FU 05', 'SF 01', 'EG 01', 'SF 09', 'ZN 06', 'AG 12', 'ZN 04', 'CU 04', 'SC 11', 'NI 09', 'SN 09', 'AP 02', 
