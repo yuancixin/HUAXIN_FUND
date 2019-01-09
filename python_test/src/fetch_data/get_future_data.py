@@ -73,18 +73,63 @@ def clean_data():
     """
     print('---开始数据去重!---')
     df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
+    code = ZCE_CODE + DCE_CODE + SHF_CODE
+    df_source = df_source[df_source["ts_code"].isin(code)]
     df_source.sort_values(by=['ts_code', 'trade_date', 'year'], ascending=(True, True, True), inplace=True)
     df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
     df_source = df_source.reset_index(drop=True)
     print('---期货数据去重完成---')
     print('---开始缺失值填充!---')
-    for i in range(0, len(df_source)):
-        if pd.isnull(df_source.loc[i, 'close']):
-            if i > 0:
-                df_source.loc[i, 'close'] = df_source.loc[i - 1, 'close']
-            else:
-                df_source.loc[i, 'close'] = 0
+    null_index = df_source[pd.isnull(df_source['close'])].index.tolist()
+    for i in null_index:
+        if i > 0:
+            df_source.loc[i, 'close'] = df_source.loc[i - 1, 'close']
+        else:
+            df_source.loc[i, 'close'] = 0
     df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
+
+
+def add_new(add_zce_code, add_dce_code, add_shf_code):
+    
+    def get_all_add_daily(pro, start_date, end_date, year_code, add_zce_code, add_dce_code, add_shf_code):
+        """
+        按年份 获取 给定合约代码 交易日区间 期货日线行情
+        """
+        result = pd.DataFrame()
+        print('ZCE开始')
+        for code in add_zce_code:
+            df = get_code_daily(pro, '%s.ZCE' % code.replace(" ", year_code), start_date, end_date)
+            df['ts_code'] = code
+            df['year'] = year_code
+            result = result.append(df)
+        print('DCE开始')
+        for code in add_dce_code:
+            df = get_code_daily(pro, '%s.DCE' % code.replace(" ", year_code), start_date, end_date)
+            df['ts_code'] = code
+            df['year'] = year_code
+            result = result.append(df)
+        print('SHF开始')
+        for code in add_shf_code:
+            df = get_code_daily(pro, '%s.SHF' % code.replace(" ", year_code), start_date, end_date)
+            df['ts_code'] = code
+            df['year'] = year_code
+            result = result.append(df)
+        return result
+
+    df_source = pd.read_csv('%s/future_data.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
+    start_date = '20000101'
+    end_date = str(df_source['trade_date'].max())
+    pro = ts.pro_api(TOKEN) 
+    year_code = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
+    for year in year_code:
+        print('%s开始' % year)
+        result = get_all_add_daily(pro, start_date, end_date, year, add_zce_code, add_dce_code, add_shf_code)
+        result.to_csv('%s/future_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/future_data.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')
+        if not year_code[len(year_code) - 1] == year:
+            time.sleep(6)
+    print('---期货数据爬取完成---')
+    clean_data()
+    print('---程序结束---')
 
 
 def main():
