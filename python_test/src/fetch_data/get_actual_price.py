@@ -58,7 +58,7 @@ def get_JD_price():
         df_result.to_csv('%s/JD_price.csv' % SOURCE_DIR, header=not os.path.exists('%s/JD_price.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')  
         print('---采集完成，正在进行数据清洗---')
         df_source = pd.read_csv('%s/JD_price.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)
-        df_source.sort_values(by=['title', 'trade_date'], ascending=(True, True), inplace=True)
+        df_source.sort_values(by=['trade_date', 'title'], ascending=(True, True), inplace=True)
         df_source.drop_duplicates(subset=['title'], keep='first', inplace=True)
         df_source.to_csv('%s/JD_price.csv' % SOURCE_DIR, index=0, encoding='utf-8')
         print('---数据更新完成---')
