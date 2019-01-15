@@ -130,6 +130,16 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="check_update_option">
+             <property name="text">
+              <string>期权</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="check_update_actual">
              <property name="text">
               <string>基价</string>

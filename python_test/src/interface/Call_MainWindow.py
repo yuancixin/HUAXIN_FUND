@@ -9,6 +9,7 @@ from interface.MatplotlibWidget import MatplotlibWidget
 from config.properties import SOURCE_DIR
 import fetch_data.get_future_data
 import fetch_data.get_stock_data
+import fetch_data.get_option_data
 import fetch_data.get_actual_price
 import fetch_data.get_research_data
 import trading_strategy.future_strategy_NM
@@ -42,7 +43,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.button_update.setEnabled(False)
         self.button_update.setText('请稍等...')
         self.label_update_state.setText('数据正在更新中')
-        self.Update_thread = UpdateThread(self.check_update_future, self.check_update_stock, self.check_update_actual, self.check_update_research)
+        self.Update_thread = UpdateThread(self.check_update_future, self.check_update_stock, self.check_update_option, self.check_update_actual, self.check_update_research)
         self.Update_thread.UpdateEndSignal.connect(self.update_end)
         self.Update_thread.start()
         
@@ -140,10 +141,11 @@ class StrategyFutureThread(QThread):
 class UpdateThread(QThread):
     UpdateEndSignal = pyqtSignal()
 
-    def __init__(self, check_update_future, check_update_stock, check_update_actual, check_update_research, parent=None):
+    def __init__(self, check_update_future, check_update_stock, check_update_option, check_update_actual, check_update_research, parent=None):
         super(UpdateThread, self).__init__(parent)
         self.check_update_future = check_update_future
         self.check_update_stock = check_update_stock
+        self.check_update_option = check_update_option
         self.check_update_actual = check_update_actual
         self.check_update_research = check_update_research
     
@@ -158,6 +160,11 @@ class UpdateThread(QThread):
                 fetch_data.get_stock_data.main()
             except:
                 print('股票数据更新失败，请检查原因')
+        if self.check_update_option.isChecked():
+            try:
+                fetch_data.get_option_data.main()
+            except:
+                print('期权数据更新失败，请检查原因')
         if self.check_update_actual.isChecked():
             try:
                 fetch_data.get_actual_price.main()
