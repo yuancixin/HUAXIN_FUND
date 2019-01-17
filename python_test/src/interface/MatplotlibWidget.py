@@ -30,7 +30,10 @@ class MyFigure(FigureCanvas):
         self.axes1 = self.fig.add_subplot(311)
         self.fig.suptitle('%s and %s (N=%s)' % (code1, code2, N))
         self.axes1.plot(x, y11, label='difference')
-        self.axes1.plot(x, y12, label='ave_difference')
+        if int(N) > 0:
+            self.axes1.plot(x, y12, label='ave_difference')
+        else:
+            pass
         self.axes1.legend(loc='upper left')
         self.axes1.grid(True)
         self.axes2 = self.fig.add_subplot(312)
