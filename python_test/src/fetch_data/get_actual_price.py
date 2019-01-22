@@ -29,6 +29,7 @@ def get_JD_price():
         if '山东鸡蛋价格行情' in link.get_text():
             herf = link['href']
 #             print(link.name, link['href'], link.get_text())
+#             print(herf)
             break
 
     res = urllib.request.urlopen(herf)
@@ -45,7 +46,18 @@ def get_JD_price():
             if '德州-' in i.get_text():
                 price = i.get_text().split('参考价')[1].split('-')[0].replace('涨', '').replace('降', '')
                 price_list.append(float(price))
-            
+        while len(price_list) == 0:
+            next_link = soup.find('div',class_ = 'Pagenav').find_all('a')
+            next_href = herf.replace(herf.split('/')[-1], next_link[-1]['href'])
+            res = urllib.request.urlopen(next_href)
+            html = res.read().decode("gb2312", "ignore")
+            soup = BeautifulSoup(html, "html.parser")
+            p_list = soup.find_all('p')
+            for i in p_list:
+                if '德州-' in i.get_text():
+                    price = i.get_text().split('参考价')[1].split('-')[0].replace('涨', '').replace('降', '')
+                    price_list.append(float(price))
+        
         price_sum = 0
         for i in price_list:
             price_sum = price_sum + i
