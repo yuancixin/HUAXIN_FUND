@@ -22,11 +22,11 @@ def get_JD_price():
     res = urllib.request.urlopen("http://www.zhujiage.com.cn/yangji/jidanjiage/")
     html = res.read().decode("gb2312", "ignore")
     soup = BeautifulSoup(html, "html.parser")
-    links = soup.find_all('a')
+    links = soup.find('div', class_='lmlist').find_all('a')
 
     herf = ''
     for link in links:
-        if '山东鸡蛋价格行情' in link.get_text():
+        if '山东鸡蛋价格' in link.get_text():
             herf = link['href']
 #             print(link.name, link['href'], link.get_text())
 #             print(herf)
