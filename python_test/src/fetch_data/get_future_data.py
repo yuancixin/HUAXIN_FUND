@@ -87,7 +87,12 @@ def clean_data():
         else:
             df_source.loc[i, 'close'] = 0
     df_source.to_csv('%s/future_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
-
+    new_date = str(df_source['trade_date'].max())
+    today_date = datetime.datetime.now().strftime('%Y%m%d')
+    if new_date == today_date:
+        print('<<<<<<%s数据已经采集完毕>>>>>>' % today_date)
+    else:
+        print('<<<<<<%s数据还未更新，最新数据为%s>>>>>>' % (today_date,new_date))
 
 def add_new(add_zce_code, add_dce_code, add_shf_code):
     
@@ -154,7 +159,7 @@ def main():
             daily_data.to_csv('%s/future_data.csv' % SOURCE_DIR, header=not os.path.exists('%s/future_data.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')
         print('---期货数据爬取完成---')
         clean_data()
-        print('---期货数据已是最新---')
+        print('---期货数据更新结束---')
 
 
 if __name__ == '__main__': 

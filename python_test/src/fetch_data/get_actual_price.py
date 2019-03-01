@@ -39,7 +39,7 @@ def get_JD_price():
     date_now1 = datetime.datetime.now().strftime('%Y{y}%m{m}%d{d}').format(y='年', m='月', d='日')
     now = datetime.datetime.now().timetuple()
     date_now2 = '%s年%s月%s日' % (str(now.tm_year), str(now.tm_mon), str(now.tm_mday))
-    if date_now1 in title or date_now2 in title:
+    if not date_now1 in title or date_now2 in title:
         p_list = soup.find('div', id='content').find_all('p')
         price_list = []
         for i in p_list:
@@ -66,7 +66,7 @@ def get_JD_price():
     
         result = [[today, str(round(ave_price, 3)), ";".join([str(x) for x in price_list]), title]]
         df_result = pd.DataFrame(result, columns=('trade_date', 'ave_price', 'price_list', 'title'))
-        print(df_result[['title', 'ave_price']])
+#         print(df_result[['title', 'ave_price']])
         df_result.to_csv('%s/JD_price.csv' % SOURCE_DIR, header=not os.path.exists('%s/JD_price.csv' % SOURCE_DIR), mode='a', index=0, encoding='utf-8')  
         print('---采集完成，正在进行数据清洗---')
         df_source = pd.read_csv('%s/JD_price.csv' % SOURCE_DIR, quoting=csv.QUOTE_NONE)

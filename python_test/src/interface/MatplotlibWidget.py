@@ -7,7 +7,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 
 class MyFigure(FigureCanvas):
-    """这是一个窗口部件，即QWidget（当然也是FigureCanvasAgg）"""
+    """这是一个窗口部件，即QWidget（也是FigureCanvasAgg）"""
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         

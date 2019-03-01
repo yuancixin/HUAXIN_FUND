@@ -73,7 +73,13 @@ def update_daily():
         df_source.sort_values(by=['ts_code', 'trade_date'], ascending=(True, True), inplace=True)
         df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
         df_source.to_csv('%s/stock_daily_data.csv' % SOURCE_DIR, index=0, encoding='utf-8')
-        print('---股票日线行情数据已是最新---')
+        new_date = str(df_source['trade_date'].max())
+        today_date = datetime.datetime.now().strftime('%Y%m%d')
+        if new_date == today_date:
+            print('<<<<<<%s数据已经采集完毕>>>>>>' % today_date)
+        else:
+            print('<<<<<<%s数据还未更新，最新数据为%s>>>>>>' % (today_date,new_date))
+        print('---股票日线行情数据更新结束---')
 
 
 def update_basic():
@@ -101,7 +107,13 @@ def update_basic():
         df_source.sort_values(by=['ts_code', 'trade_date'], ascending=(True, True), inplace=True)
         df_source.drop_duplicates(subset=['ts_code', 'trade_date'], keep='first', inplace=True)
         df_source.to_csv('%s/stock_daily_basic.csv' % SOURCE_DIR, index=0, encoding='utf-8')
-        print('---股票每日指标数数据已是最新---')
+        new_date = str(df_source['trade_date'].max())
+        today_date = datetime.datetime.now().strftime('%Y%m%d')
+        if new_date == today_date:
+            print('<<<<<<%s数据已经采集完毕>>>>>>' % today_date)
+        else:
+            print('<<<<<<%s数据还未更新，最新数据为%s>>>>>>' % (today_date,new_date))
+        print('---股票每日指标数数据更新结束---')
 
 
 def main():
