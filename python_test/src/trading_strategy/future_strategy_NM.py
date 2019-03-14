@@ -91,6 +91,28 @@ def get_code_near_ave(df, N, M, D=20):
     return result
 
 
+def get_code_near_ave2(df, N1, N2, N3, M):
+    """
+    获取多个N日均线同一侧的合约
+    N:均线日期
+    M:均线邻近区间比率
+    """
+    result = []
+    all_codes = ZCE_CODE + DCE_CODE + SHF_CODE
+    for code in all_codes:
+        df1 = df[df['ts_code'] == code][['trade_date', 'close']].sort_values('trade_date', ascending=True)
+        if df1.shape[0] > 0:
+            df1['ave_close%s' % N1] = get_ave_line(df1['close'], N1)
+            df1['ave_close%s' % N2] = get_ave_line(df1['close'], N2)
+            df1['ave_close%s' % N3] = get_ave_line(df1['close'], N3)
+            df1['close'] = df1['close'].apply(pd.to_numeric)
+            if max(df1['ave_close%s' % N1].iat[-1], df1['ave_close%s' % N2].iat[-1], df1['ave_close%s' % N3].iat[-1]) < df1['close'].iat[-1] < max(df1['ave_close%s' % N1].iat[-1], df1['ave_close%s' % N2].iat[-1], df1['ave_close%s' % N3].iat[-1]) * (1 + M) or min(df1['ave_close%s' % N1].iat[-1], df1['ave_close%s' % N2].iat[-1], df1['ave_close%s' % N3].iat[-1]) * (1 - M) < df1['close'].iat[-1] < min(df1['ave_close%s' % N1].iat[-1], df1['ave_close%s' % N2].iat[-1], df1['ave_close%s' % N3].iat[-1]):
+                result.append(code)
+    
+    print('%s,%s,%s日均线附近 %s%% 的合约：' % (N1, N2, N3, M * 100))
+    print(result)
+
+
 def get_code_fit_strategy(df):
     """
     获取符合N和NM策略的合约

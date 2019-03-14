@@ -59,8 +59,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def future_strategy_start(self):
         self.button_future_strategy.setEnabled(False)
         self.button_future_strategy.setText('请稍等...')
-        self.Strategy_Future_Thread = StrategyFutureThread(self.check_fut_ave, self.check_fut_nm, self.check_fut_different, self.check_fut_comb,
-                                                           self.input_future_n.value(), self.input_future_m.value(), self.input_future_d.value(),
+        self.Strategy_Future_Thread = StrategyFutureThread(self.check_fut_ave, self.check_fut_ave2, self.check_fut_nm, self.check_fut_different, self.check_fut_comb,
+                                                           self.input_future_n.value(), self.input_future_n2.value(), self.input_future_n3.value(), self.input_future_m.value(), self.input_future_d.value(),
                                                            self.input_future_diff_code.text(), self.input_future_comb_code1.text(), self.input_future_comb_code2.text(), self.input_future_comb_n.value()
                                                            )
         self.Strategy_Future_Thread.StrategyFutureEndSignal.connect(self.future_strategy_end)
@@ -95,17 +95,20 @@ class StrategyFutureThread(QThread):
     StrategyCheckFutDifferentSignal = pyqtSignal(str, list, list)
     StrategyCheckFutCombSignal = pyqtSignal(str, str, str, list, list, list, list, list, list, list)
     
-    def __init__(self, check_fut_ave, check_fut_nm, check_fut_different, check_fut_comb,
-                 input_future_n, input_future_m, input_future_d,
+    def __init__(self, check_fut_ave, check_fut_ave2, check_fut_nm, check_fut_different, check_fut_comb,
+                 input_future_n, input_future_n2, input_future_n3, input_future_m, input_future_d,
                  input_future_diff_code, input_future_comb_code1, input_future_comb_code2, input_future_comb_n,
                  parent=None):
         super(StrategyFutureThread, self).__init__(parent)
         self.check_fut_ave = check_fut_ave
+        self.check_fut_ave2 = check_fut_ave2
         self.check_fut_nm = check_fut_nm
         self.check_fut_different = check_fut_different
         self.check_fut_comb = check_fut_comb
         
         self.input_future_n = input_future_n
+        self.input_future_n2 = input_future_n2
+        self.input_future_n3 = input_future_n3
         self.input_future_m = input_future_m
         self.input_future_d = input_future_d
         
@@ -121,7 +124,13 @@ class StrategyFutureThread(QThread):
                 trading_strategy.future_strategy_NM.get_code_near_ave(df_source, self.input_future_n, self.input_future_m, self.input_future_d)
             except:
                 print('均线策略执行失败，请检查原因')
-            
+          
+        if self.check_fut_ave2.isChecked():
+            try:
+                trading_strategy.future_strategy_NM.get_code_near_ave2(df_source, self.input_future_n, self.input_future_n2, self.input_future_n3, self.input_future_m)
+            except:
+                print('多均线策略执行失败，请检查原因')  
+                
         if self.check_fut_nm.isChecked():
             try:
                 trading_strategy.future_strategy_NM.get_code_fit_strategy(df_source)  
