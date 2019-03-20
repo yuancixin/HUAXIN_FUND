@@ -28,7 +28,13 @@ class MyFigure(FigureCanvas):
         
     def show_strategy_nm(self, code1, code2, N, x, y11, y12, y21, y22, y31, y32):
         self.axes1 = self.fig.add_subplot(311)
-        self.fig.suptitle('%s and %s (N=%s)' % (code1, code2, N))
+        if y11[-1] > y12[-1] :
+            self.fig.suptitle('%s and %s (N=%s) difference>ave_difference' % (code1, code2, N))
+        elif y11[-1] < y12[-1] :
+            self.fig.suptitle('%s and %s (N=%s) difference<ave_difference' % (code1, code2, N))
+        else:
+            print(y11[-1] , y12[-1])
+            self.fig.suptitle('%s and %s (N=%s) difference=ave_difference' % (code1, code2, N))
         self.axes1.plot(x, y11, label='difference')
         if int(N) > 0:
             self.axes1.plot(x, y12, label='ave_difference')
