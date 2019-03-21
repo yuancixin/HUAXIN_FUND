@@ -33,8 +33,8 @@ class MyFigure(FigureCanvas):
         elif y11[-1] < y12[-1] :
             self.fig.suptitle('%s and %s (N=%s) difference<ave_difference' % (code1, code2, N))
         else:
-            print(y11[-1] , y12[-1])
             self.fig.suptitle('%s and %s (N=%s) difference=ave_difference' % (code1, code2, N))
+        print('difference:%s ave_difference:%s' % (y11[-1] , y12[-1]))
         self.axes1.plot(x, y11, label='difference')
         if int(N) > 0:
             self.axes1.plot(x, y12, label='ave_difference')
