@@ -201,6 +201,7 @@ def show2(df, code1, code2, N):
     result['ave_difference%s' % N] = get_ave_line(result['difference'], N)
     result['ave_close1%s' % N] = get_ave_line(result['close1'], N)
     result['ave_close2%s' % N] = get_ave_line(result['close2'], N)
+    result = result[pd.notnull(result['ave_difference%s' % N])]
 #     plt.figure(1)
 #     plt.subplot(311)
 #     plt.plot(result['trade_date'], result['difference'], c='red', label='difference')
