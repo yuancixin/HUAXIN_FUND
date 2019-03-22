@@ -22,15 +22,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         
-        self.input_future_n.setValue(60)
-        self.input_future_m.setValue(0.010)
-        self.input_future_d.setValue(20)
-        
-        self.input_future_diff_code.setText('JD 05')
-        self.input_future_comb_code1.setText('JD 01')
-        self.input_future_comb_code2.setText('JD 05')
-        self.input_future_comb_n.setValue(60)
-        
         self.button_update.clicked.connect(self.update_start)
         self.button_clearlog.clicked.connect(self.clearlog)
         self.button_future_strategy.clicked.connect(self.future_strategy_start)
